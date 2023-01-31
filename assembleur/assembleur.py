@@ -1,27 +1,30 @@
 import re
 
-comment = re.compile(r"^#")
-label = re.compile(r"^\w")
+def load_asm(asm_file):
+    comment = re.compile(r"^#")
+    label = re.compile(r"^\w")
+    linebreak = re.compile(r"\n")
 
-
-
-with open("data.asm", "r") as fp:
-    data = []
-    for line in fp:
-        if comment.match(line) or label.match(line):
-                continue
-        else:
-            instr=[]
-            line = line.replace("\n", "")
-            line = line.replace(" ", ",")
-            line = line.split(",")   
-            print(line)      
-            instr.append(line)
-            
-        data.append(instr)
-fp.close()
+    with open(asm_file, "r") as fp:
+        data = []
+        for line in fp:
+            if comment.match(line) or label.match(line) or linebreak.match(line):
+                    continue
+            else:
+                line = line.replace(',', ' ')
+                line = line.split()   
+                if '#' in line:
+                    line = line[:line.index('#')]
+                
+            data.append(line)
         
-#print(data)
+    return data
+    
+def main():
+    data = load_asm("data.asm")
+    print(data)
+    
 
-        
-        
+
+if __name__ == '__main__':
+    main()        
