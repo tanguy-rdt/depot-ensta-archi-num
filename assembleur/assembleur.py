@@ -3,77 +3,106 @@
 
 import re
 
-opcode = {}
-opcode["stop"]  = 0
-opcode["add"]   = 1
-opcode["sub"]   = 2
-opcode["mul"]   = 3
-opcode["div"]   = 4
-opcode["and"]   = 5
-opcode["or"]    = 6
-opcode["xor"]   = 7
-opcode["shl"]   = 8
-opcode["shr"]   = 9
-opcode["slt"]   = 10
-opcode["sle"]   = 11
-opcode["seq"]   = 12
-opcode["load"]  = 13
-opcode["store"] = 14
+class EncodeInstr:
+    def __init__ (self, instr_txt):
+        self.instr_txt = instr_txt
+        
+        self.opcode = {}
+        self.opcode["stop"]  = 0
+        self.opcode["add"]   = 1
+        self.opcode["sub"]   = 2
+        self.opcode["mul"]   = 3
+        self.opcode["div"]   = 4
+        self.opcode["and"]   = 5
+        self.opcode["or"]    = 6
+        self.opcode["xor"]   = 7
+        self.opcode["shl"]   = 8
+        self.opcode["shr"]   = 9
+        self.opcode["slt"]   = 10
+        self.opcode["sle"]   = 11
+        self.opcode["seq"]   = 12
+        self.opcode["load"]  = 13
+        self.opcode["store"] = 14
 
-register = {}
-register["r0"] = 0
-register["r1"] = 1
-register["r2"] = 2
-register["r3"] = 3
-register["r4"] = 4
-register["r5"] = 5
-register["r6"] = 6
-register["r7"] = 7
-register["r8"] = 8
-register["r9"] = 9
+        self.register = {}
+        self.register["r0"] = 0
+        self.register["r1"] = 1
+        self.register["r2"] = 2
+        self.register["r3"] = 3
+        self.register["r4"] = 4
+        self.register["r5"] = 5
+        self.register["r6"] = 6
+        self.register["r7"] = 7
+        self.register["r8"] = 8
+        self.register["r9"] = 9
+    
+    def get_opcode(self):
+        return self.opcode.get(self.instr_txt[0])
+    
+    def get_r_alpha(self):
+        if self.get_opcode() == 0:
+            return 0
+        
+        return self.register.get(self.instr_txt[1])
+        
+    def get_imm(self):
+        if self.get_opcode() == 0:
+            return 0
+        
+        if not self.instr_txt[2] in self.register:
+            return 1
+        else:
+            return 0
+    
+    def get_o(self):
+        if self.get_opcode() == 0:
+            return 0
+        if self.get_imm():
+            return int(self.instr_txt[2])
+        return self.register.get(self.instr_txt[2])
+    
+    def get_r_beta(self):
+        if self.get_opcode() == 0:
+            return 0
+        return self.register.get(self.instr_txt[3])
 
 
-def load_asm(asm_file):
+def open_asm(asm_file):
+    fd = open(asm_file, "r")
+    return fd
+
+def parse_asm(fd):
     comment = re.compile(r"^\s*#")
     label = re.compile(r"^\w")
     linebreak = re.compile(r"\n|\r")
-
-    with open(asm_file, "r") as fp:
-        data = []
-        for line in fp:
-            if comment.match(line) or label.match(line) or linebreak.match(line):
-                    continue
-            else:
-                line = line.replace(',', ' ')
-                line = line.split()  
-                if '#' in line:
-                    line = line[:line.index('#')]
-                data.append(line)
+    
+    data = []
+    for line in fd:
+        if comment.match(line) or label.match(line) or linebreak.match(line):
+                continue
+        else:
+            line = line.replace(',', ' ')
+            line = line.split()  
+            if '#' in line:
+                line = line[:line.index('#')]
+            data.append(line)
+    fd.close()
+            
     return data
-
 
 def open_bin_file():
     fd = open("data.bin", "w")
     return fd
 
-def get_instr_hex(instr_text):
-    imm = 0
-    if instr_text[0] == "stop":
-        instr = 0
-        instr = '0x{0:08X}'.format(instr)
-        return instr
+def get_instr_hex(instr_txt):
+    encode = EncodeInstr(instr_txt)
     
-    if not instr_text[2] in register:
-        imm = 1
-        
-    instr = opcode.get(instr_text[0]) << 27
-    instr += register.get(instr_text[1]) << 22
-    instr += imm << 21
-    if imm:
-        instr += int(instr_text[2]) << 5
-    else :
-        instr += register.get(instr_text[2]) << 5
-    instr += register.get(instr_text[3])
+    instr = encode.get_opcode() << 27
+    instr += encode.get_r_alpha() << 22
+    instr += encode.get_imm() << 21
+    instr += encode.get_o() << 5
+    instr += encode.get_r_beta() 
+    
     instr = '0x{0:08X}'.format(instr)
     
     return instr
@@ -86,11 +115,12 @@ def append_to_bin_file(fd, instr_num, instr_hex):
 
     
 def main():
-    instrs = load_asm("data.asm")
+    asm_fd = open_asm("data.asm")
+    instrs_txt = parse_asm(asm_fd)
     fd_binary = open_bin_file()
-    for instr in instrs:
-        instr_hex = get_instr_hex(instr)
-        append_to_bin_file(fd_binary, instrs.index(instr), instr_hex)
+    for instr_txt in instrs_txt:
+        instr_hex = get_instr_hex(instr_txt)
+        append_to_bin_file(fd_binary, instrs_txt.index(instr_txt), instr_hex)
         
 
 if __name__ == '__main__':
