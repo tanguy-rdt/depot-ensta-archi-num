@@ -15,11 +15,11 @@ label1:
 
 label2: 
         store r7, 18,r9
-#        braz  r0, label1
-#        branz r2, label2
+        braz  r0, 0
+        branz r2, 0
         sub r3,-42,r3
 
 label3:
- #       jmp r2, r0
+        jmp r2, r0
         stop              # hey
         add r1,-1,r2

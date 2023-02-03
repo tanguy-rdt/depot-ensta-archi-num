@@ -1,4 +1,4 @@
-#TODO: jmp, braz, branz, scall
+#TODO: braz, branz: label
 #TODO: negative value with imm
 
 import re
@@ -23,6 +23,10 @@ class EncodeInstr:
         self.opcode["seq"]   = 12
         self.opcode["load"]  = 13
         self.opcode["store"] = 14
+        self.opcode["jmp"]   = 15
+        self.opcode["braz"]  = 16
+        self.opcode["branz"] = 17
+        self.opcode["scall"] = 18
 
         self.register = {}
         self.register["r0"] = 0
@@ -40,31 +44,32 @@ class EncodeInstr:
         return self.opcode.get(self.instr_txt[0])
     
     def get_r_alpha(self):
-        if self.get_opcode() == 0:
-            return 0
-        
         return self.register.get(self.instr_txt[1])
         
-    def get_imm(self):
-        if self.get_opcode() == 0:
-            return 0
-        
-        if not self.instr_txt[2] in self.register:
+    def get_imm(self, index_o):
+        if not self.instr_txt[index_o] in self.register:
             return 1
         else:
             return 0
     
-    def get_o(self):
-        if self.get_opcode() == 0:
-            return 0
-        if self.get_imm():
-            return int(self.instr_txt[2])
-        return self.register.get(self.instr_txt[2])
+    def get_o(self, index_o):
+        if self.get_imm(index_o):
+            return int(self.instr_txt[index_o])
+        else:
+            return self.register.get(self.instr_txt[index_o])
     
     def get_r_beta(self):
-        if self.get_opcode() == 0:
-            return 0
         return self.register.get(self.instr_txt[3])
+    
+    def get_r(self, index_r):
+        return self.register.get(self.instr_txt[index_r])
+            
+    def get_a(self):
+        return int(self.instr_txt[2])
+
+    
+    def get_n(self):
+        return int(self.instr_txt[1])     
 
 
 def open_asm(asm_file):
@@ -96,12 +101,29 @@ def open_bin_file():
 
 def get_instr_hex(instr_txt):
     encode = EncodeInstr(instr_txt)
+    opcode_txt = instr_txt[0]    
     
-    instr = encode.get_opcode() << 27
-    instr += encode.get_r_alpha() << 22
-    instr += encode.get_imm() << 21
-    instr += encode.get_o() << 5
-    instr += encode.get_r_beta() 
+    instr = 0
+    if opcode_txt == "jmp":
+        instr += encode.get_opcode() << 27
+        instr += encode.get_imm(index_o=1) << 26
+        instr += encode.get_o(index_o=1) << 5
+        instr += encode.get_r(index_r=2)
+    elif opcode_txt == "braz" or opcode_txt == "branz":
+        instr += encode.get_opcode() << 27
+        instr += encode.get_r(index_r=1) << 22
+        instr += encode.get_a()
+    elif opcode_txt == "scall":
+        instr += encode.get_opcode() << 27
+        instr += encode.get_n()
+    elif opcode_txt == "stop":
+        instr += encode.get_opcode() << 27
+    else:
+        instr += encode.get_opcode() << 27
+        instr += encode.get_r_alpha() << 22
+        instr += encode.get_imm(index_o=2) << 21
+        instr += encode.get_o(index_o=2) << 5
+        instr += encode.get_r_beta() 
     
     instr = '0x{0:08X}'.format(instr)
     
