@@ -141,13 +141,22 @@ void eval(Instr_t instr){
             running = 0;
             printf("(stop)\n");
             break;
+        case ADD:
+            if (instr.imm) {
+                printf("add r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+                regs[instr.r_beta] = regs[instr.r_alpha] + instr.o;
+            }
+            else {
+                printf("add r%d r%d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+                regs[instr.r_beta] = regs[instr.r_alpha] + regs[instr.o];
+            }
+            break;
         case JMP:
             printf("(%d, %d, %d, %d)\n", instr.opcode, instr.imm, instr.o, instr.r);
             break;
         case BRAZ:
             printf("(%d, %d, %d)\n", instr.opcode, instr.r, instr.a);
             break;
-
         case BRANZ:
             printf("(%d, %d, %d)\n", instr.opcode, instr.r, instr.a);
             break;
