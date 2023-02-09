@@ -3,6 +3,9 @@
 
 import re
 
+label_addr = {}
+
+
 class EncodeInstr:
     def __init__ (self, instr_txt):
         self.instr_txt = instr_txt
@@ -53,10 +56,11 @@ class EncodeInstr:
             return 0
     
     def get_o(self, index_o):
-        if self.get_imm(index_o):
-            return int(self.instr_txt[index_o])
-        else:
-            return self.register.get(self.instr_txt[index_o])
+        if self.instr_txt[index_o] in label_addr: # si c'est un label 
+            return label_addr.get(self.instr_txt[index_o])
+        elif self.get_imm(index_o):
+            return int(hex(int(self.instr_txt[index_o]) + (1<<16)), 16)
+        return self.register.get(self.instr_txt[index_o])
     
     def get_r_beta(self):
         return self.register.get(self.instr_txt[3])
@@ -65,11 +69,13 @@ class EncodeInstr:
         return self.register.get(self.instr_txt[index_r])
             
     def get_a(self):
+        if self.instr_txt[2] in label_addr:
+            return label_addr.get(self.instr_txt[2])
         return int(self.instr_txt[2])
 
-    
     def get_n(self):
-        return int(self.instr_txt[1])     
+        return int(self.instr_txt[1])  
+    
 
 
 def open_asm(asm_file):
@@ -82,9 +88,11 @@ def parse_asm(fd):
     linebreak = re.compile(r"\n|\r")
     
     data = []
-    for line in fd:
-        if comment.match(line) or label.match(line) or linebreak.match(line):
-                continue
+    for line in fd:        
+        if comment.match(line) or linebreak.match(line):
+            continue
+        if label.match(line):
+            label_addr[line[:line.index(':')]] = len(data)
         else:
             line = line.replace(',', ' ')
             line = line.split()  
