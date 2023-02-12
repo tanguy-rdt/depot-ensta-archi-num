@@ -59,7 +59,7 @@ class EncodeInstr:
         if self.instr_txt[index_o] in label_addr: # si c'est un label 
             return label_addr.get(self.instr_txt[index_o])
         elif self.get_imm(index_o):
-            return int(hex(int(self.instr_txt[index_o]) + (1<<16)), 16)
+            return int(hex((int(self.instr_txt[index_o]) + (1<<16)) & 0x0000ffff), 16)
         return self.register.get(self.instr_txt[index_o])
     
     def get_r_beta(self):
