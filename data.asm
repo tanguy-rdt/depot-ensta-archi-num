@@ -1,25 +1,15 @@
-#test 1 asm : dummy code to test all instruction conversion
-        add  r7, r2,r3    # presenté dans le slideware 0x09c00043
-        add  r1, r2,r3    # additionner c'est bien
-        sub  r4,  5,r6
-
-label1:
-        mul  r7,  8,r8    # multiplier c'est mieux
-        div  r1, r2,r3
-        and  r4,  5,r6
-        or   r7, 18,r9
-        xor  r1, r2,r3
-        shl  r4,  5,r6
-        seq  r7, 18,r9
-        load r4,  5,r6
-
-label2: 
-        store r7, 18,r9
-        braz  r0, label1
-        branz r2, label2
-        sub r3,-42,r3
-
-label3:
-        jmp r2, r0
-        stop              # hey
-        add r1,-1,r2
+        add  r0, 2,  r1    # presenté dans le slideware 0x09c00043
+        add  r0, 8,  r2    # additionner c'est bien
+        add  r1, r2, r3
+        sub  r2, r1, r4
+        mul  r1, r2, r5
+        div  r2, r1, r6
+        and  r1, r4, r7
+        or   r1, r4, r8
+        xor  r1, r4, r9
+        shl  r1, r2, r10
+        shr  r2, r1, r11
+        slt  r2, r1, r3
+        sle  r1, r2, r4
+        seq  r6, r9, r5
+        stop
