@@ -68,7 +68,7 @@ char** parseFile(FILE* ptr){
     char instr_num[11] = "";
     char instr[11] = "";
 
-    instrs = (char**)malloc(19 * sizeof(char*));
+    instrs = (char**)malloc(100 * sizeof(char*));
 
     int i = 0;
     while (fscanf(ptr, "%s %s", instr_num, instr) != EOF) {
@@ -115,7 +115,7 @@ Instr_t decode(int instr){
             break;
         case BRANZ: 
             my_instr.r       = (instr >> 22) & 0x0000001f;
-            my_instr.a       = (instr)       & 0x03ffffff;
+            my_instr.a       = (instr)       & 0x001fffff;
             break;
         case SCALL:
             my_instr.n       = (instr)       & 0x001fffff;
@@ -201,10 +201,12 @@ void eval(Instr_t instr){
             printf("(%d, %d, %d, %d)\n", instr.opcode, instr.imm, instr.o, instr.r);
             break;
         case BRAZ:
-            printf("(%d, %d, %d)\n", instr.opcode, instr.r, instr.a);
+            printf("braz r%d, %d\n", instr.r, instr.a);
+            if (regs[instr.r] == 0) instr_num = instr.a;
             break;
         case BRANZ:
-            printf("(%d, %d, %d)\n", instr.opcode, instr.r, instr.a);
+            printf("branz r%d, %d\n", instr.r, instr.a);
+            if (regs[instr.r] != 0) instr_num = instr.a;
             break;
         case SCALL:
             printf("(%d, %d)\n", instr.opcode, instr.a);
