@@ -1,10 +1,6 @@
-#TODO: braz, branz: label
-#TODO: negative value with imm
-
 import re
 
 label_addr = {}
-
 
 class EncodeInstr:
     def __init__ (self, instr_txt):
@@ -32,16 +28,9 @@ class EncodeInstr:
         self.opcode["scall"] = 18
 
         self.register = {}
-        self.register["r0"] = 0
-        self.register["r1"] = 1
-        self.register["r2"] = 2
-        self.register["r3"] = 3
-        self.register["r4"] = 4
-        self.register["r5"] = 5
-        self.register["r6"] = 6
-        self.register["r7"] = 7
-        self.register["r8"] = 8
-        self.register["r9"] = 9
+        for i in range(32):
+            register_num = 'r' + str(i)
+            self.register[register_num] = i
     
     def get_opcode(self):
         return self.opcode.get(self.instr_txt[0])
