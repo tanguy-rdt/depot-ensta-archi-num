@@ -1,3 +1,10 @@
+//TODO: ne pas oublier de bloquer r0 a 0
+//TODO: mettre bien les types de variables
+//TODO: allocation dynamique
+//TODO: and, or, xor j'ai pas l'impression que ça marche. Je pense il faudrait les convertires en binaires
+//      parce que 0010 (2) | 0110 (6) = 8 --> 1000 (8) et pas 0110 (6), il ne retient pas la retenu en faite
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,20 +30,9 @@
 #define BRANZ  17
 #define SCALL  18
 
-#define R0     0
-#define R1     1
-#define R2     2
-#define R3     3
-#define R4     4
-#define R5     5
-#define R6     6
-#define R7     7
-#define R8     8
-#define R9     9
+#define NB_REGS 32
 
-#define NB_REGS 9
-
-unsigned regs[ NB_REGS ];
+unsigned regs[NB_REGS];
 
 char **instrs = NULL;
 int instr_num = 0;
@@ -136,20 +132,70 @@ Instr_t decode(int instr){
 }
 
 void eval(Instr_t instr){
+    int o;
+    
+    if (instr.imm) o = instr.o;
+    else o = regs[instr.o];
+
     switch (instr.opcode){
         case STOP:
             running = 0;
             printf("(stop)\n");
             break;
         case ADD:
-            if (instr.imm) {
-                printf("add r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-                regs[instr.r_beta] = regs[instr.r_alpha] + instr.o;
-            }
-            else {
-                printf("add r%d r%d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-                regs[instr.r_beta] = regs[instr.r_alpha] + regs[instr.o];
-            }
+            printf("add r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            regs[instr.r_beta] = regs[instr.r_alpha] + o;
+            break;
+        case SUB:
+            printf("sub r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            regs[instr.r_beta] = regs[instr.r_alpha] - o;
+            break;
+        case MUL:
+            printf("mul r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            regs[instr.r_beta] = regs[instr.r_alpha] * o;
+            break;
+        case DIV:
+            printf("div r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            regs[instr.r_beta] = regs[instr.r_alpha] / o;
+            break;
+        case AND:
+            printf("and r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            regs[instr.r_beta] = regs[instr.r_alpha] & o;
+            break;
+        case OR:
+            printf("or r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            regs[instr.r_beta] = regs[instr.r_alpha] | o;
+            break;
+        case XOR:
+            printf("xor r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            regs[instr.r_beta] = regs[instr.r_alpha] ^ o;
+            break;
+        case SHL:
+            printf("shl r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            regs[instr.r_beta] = regs[instr.r_alpha] << o;
+            break;
+        case SHR:
+            printf("shr r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            regs[instr.r_beta] = regs[instr.r_alpha] >> o;
+            break;
+        case SLT:
+            printf("slt r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            if (regs[instr.r_alpha] < o) regs[instr.r_beta] = 1;
+            else regs[instr.r_beta] = 0;
+            break;
+        case SLE:
+            printf("sle r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            if (regs[instr.r_alpha] <= o) regs[instr.r_beta] = 1;
+            else regs[instr.r_beta] = 0;
+            break;
+        case SEQ:
+            printf("seq r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
+            if (regs[instr.r_alpha] == o) regs[instr.r_beta] = 1;
+            else regs[instr.r_beta] = 0;
+            break;
+        case STORE:
+            printf("store r%d %d r%d\n", instr.r_alpha, o, instr.r_beta);
+            regs[instr.r_alpha + o] = regs[instr.r_beta];       
             break;
         case JMP:
             printf("(%d, %d, %d, %d)\n", instr.opcode, instr.imm, instr.o, instr.r);
