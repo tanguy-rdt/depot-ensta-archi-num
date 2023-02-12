@@ -17,4 +17,6 @@ label1:
         slt  r2, r1, r3
         sle  r1, r2, r4
         seq  r6, r9, r5
+        load r0, 10, r20
+        store r0, 21, r11
         stop

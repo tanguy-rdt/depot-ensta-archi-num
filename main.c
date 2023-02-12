@@ -3,6 +3,7 @@
 //TODO: allocation dynamique
 //TODO: and, or, xor j'ai pas l'impression que ça marche. Je pense il faudrait les convertires en binaires
 //      parce que 0010 (2) | 0110 (6) = 8 --> 1000 (8) et pas 0110 (6), il ne retient pas la retenu en faite
+//TODO: vérifier que load est store sont correcte, si on simule ou ne passe pas par une mémoire alors c'est bon
 
 
 #include <stdio.h>
@@ -192,6 +193,10 @@ void eval(Instr_t instr){
             printf("seq r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
             if (regs[instr.r_alpha] == o) regs[instr.r_beta] = 1;
             else regs[instr.r_beta] = 0;
+            break;
+        case LOAD:
+            printf("load r%d %d r%d\n", instr.r_alpha, o, instr.r_beta);
+            regs[instr.r_beta] = regs[instr.r_alpha + o];       
             break;
         case STORE:
             printf("store r%d %d r%d\n", instr.r_alpha, o, instr.r_beta);
