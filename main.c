@@ -1,6 +1,5 @@
 //TODO: ne pas oublier de bloquer r0 a 0
 //TODO: mettre bien les types de variables
-//TODO: allocation dynamique
 //TODO: and, or, xor j'ai pas l'impression que ça marche. Je pense il faudrait les convertires en binaires
 //      parce que 0010 (2) | 0110 (6) = 8 --> 1000 (8) et pas 0110 (6), il ne retient pas la retenu en faite
 //TODO: vérifier que load est store sont correcte, si on simule ou ne passe pas par une mémoire alors c'est bon
@@ -66,19 +65,16 @@ FILE* openFile(char *pathFile){
 }
 
 char** parseFile(FILE* ptr){
-    char instr_num[11] = "";
+    char instrNum[11] = "";
     char instr[11] = "";
 
-    instrs = (char**)malloc(100 * sizeof(char*));
-
     int i = 0;
-    while (fscanf(ptr, "%s %s", instr_num, instr) != EOF) {
-        //instrs = (char**)malloc(sizeof(char*));
-        instrs[i] = (char*)malloc (strlen (instr));
-        strcpy (instrs[i], instr);
+    while (fscanf(ptr, "%s %s", instrNum, instr) != EOF) {
+        instrs = (char**)realloc(instrs, sizeof(instrs) * (i+1));
+        instrs[i] = (char*)malloc(strlen(instr));
+        strcpy(instrs[i], instr);
         i++;
     }
-
     fclose(ptr);
 
     return instrs;
