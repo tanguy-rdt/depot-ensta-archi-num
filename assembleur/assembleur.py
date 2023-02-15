@@ -1,3 +1,4 @@
+import os
 import re
 
 label_addr = {}
@@ -93,7 +94,8 @@ def parse_asm(fd):
     return data
 
 def open_bin_file():
-    fd = open("data.bin", "w")
+    bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../data.bin"))
+    fd = open(bin_path_file, "w")
     return fd
 
 def get_instr_hex(instr_txt):
@@ -134,7 +136,8 @@ def append_to_bin_file(fd, instr_num, instr_hex):
 
     
 def main():
-    asm_fd = open_asm("data.asm")
+    asm_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../data.asm"))
+    asm_fd = open_asm(asm_path_file)
     instrs_txt = parse_asm(asm_fd)
     fd_binary = open_bin_file()
     for instr_txt in instrs_txt:

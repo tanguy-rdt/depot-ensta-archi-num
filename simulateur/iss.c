@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <libgen.h>
 
 #define STOP   0
 #define ADD    1
@@ -221,8 +222,10 @@ void eval(Instr_t instr){
 
 int main(int argc, const char* argv[]){
     FILE* ptrFile;
-
-    ptrFile = openFile("data.bin");
+    char* filePath;
+    
+    filePath = strcat(dirname(realpath(__FILE__, NULL)), "/../data.bin");
+    ptrFile = openFile(filePath);
     instrs = parseFile(ptrFile);
 
     while(running){

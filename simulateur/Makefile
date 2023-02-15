@@ -1,12 +1,12 @@
 CC = gcc
 CFLAGS = -Wall
-PROGRAMS = main
+PROGRAMS = iss
 
 
 all: $(PROGRAMS)
 
 sema: sema.c
-	$(CC) main.c -o main $(CFLAGS)
+	$(CC) iss.c -o iss $(CFLAGS)
 
 clean:
 	rm -rf $(PROGRAMS)
