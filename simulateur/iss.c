@@ -162,11 +162,11 @@ void eval(Instr_t instr){
             break;
         case OR:
             printf("or r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            regs[instr.r_beta] = regs[instr.r_alpha] | o;
+            regs[instr.r_beta] = (regs[instr.r_alpha] | o) + (regs[instr.r_alpha] & o);
             break;
         case XOR:
             printf("xor r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            regs[instr.r_beta] = regs[instr.r_alpha] ^ o;
+            regs[instr.r_beta] = (regs[instr.r_alpha] ^ o) + (regs[instr.r_alpha] & o);
             break;
         case SHL:
             printf("shl r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
