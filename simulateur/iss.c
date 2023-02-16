@@ -1,8 +1,7 @@
-//TODO: ne pas oublier de bloquer r0 a 0
-//TODO: mettre bien les types de variables
 //TODO: and, or, xor j'ai pas l'impression que ça marche. Je pense il faudrait les convertires en binaires
 //      parce que 0010 (2) | 0110 (6) = 8 --> 1000 (8) et pas 0110 (6), il ne retient pas la retenu en faite
-//TODO: vérifier que load est store sont correcte, si on simule ou ne passe pas par une mémoire alors c'est bon
+//TODO: valeur signé
+//TODO: gestion de la mem
 
 
 #include <stdio.h>
@@ -33,7 +32,7 @@
 
 #define NB_REGS 32
 
-unsigned regs[NB_REGS];
+uint32_t regs[NB_REGS];
 
 char **instrs = NULL;
 int instr_num = 0;
@@ -41,14 +40,14 @@ int instr_num = 0;
 int running = 1;
 
 typedef struct {
-    int opcode;
-    int imm;
-    int r_beta;
-    int r_alpha;
-    int o;
-    int r;
-    int a;
-    int n;
+    int32_t opcode;
+    int32_t imm;
+    int32_t r_beta;
+    int32_t r_alpha;
+    int32_t o;
+    int32_t r;
+    int32_t a;
+    int32_t n;
 } Instr_t;
 
 FILE* openFile(char *pathFile){
@@ -84,19 +83,19 @@ char** parseFile(FILE* ptr){
 void showRegs(){
     printf("regs = ");
     for (int i = 0; i < NB_REGS; i++){
-        printf("%04X ", regs[i]);
+        printf("0x%04X ", (regs[i] & 0x0000ffff));
     }
     printf("\n");
 }
 
-int32_t fetch(){
+uint32_t fetch(){
     char* instr = instrs[instr_num++];
-    return (int)strtol(instr, NULL, 0);
+    return (uint32_t)strtol(instr, NULL, 0);
 }
 
-Instr_t decode(int instr){
+Instr_t decode(uint32_t instr){
     Instr_t my_instr;
-    int opcode = (instr >> 27) & 0x0000001f;
+    uint32_t opcode = (instr >> 27) & 0x0000001f;
     my_instr.opcode = opcode;
 
     switch(opcode){
@@ -130,10 +129,12 @@ Instr_t decode(int instr){
 }
 
 void eval(Instr_t instr){
-    int o;
+    uint32_t o;
     
-    if (instr.imm) o = instr.o;
-    else o = regs[instr.o];
+    if (instr.imm) 
+        o = instr.o;
+    else
+         o = regs[instr.o];
 
     switch (instr.opcode){
         case STOP:
@@ -178,59 +179,71 @@ void eval(Instr_t instr){
             break;
         case SLT:
             printf("slt r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            if (regs[instr.r_alpha] < o) regs[instr.r_beta] = 1;
-            else regs[instr.r_beta] = 0;
+            if (regs[instr.r_alpha] < o) 
+                regs[instr.r_beta] = 1;
+            else 
+                regs[instr.r_beta] = 0;
             break;
         case SLE:
             printf("sle r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            if (regs[instr.r_alpha] <= o) regs[instr.r_beta] = 1;
-            else regs[instr.r_beta] = 0;
+            if (regs[instr.r_alpha] <= o) 
+                regs[instr.r_beta] = 1;
+            else 
+                regs[instr.r_beta] = 0;
             break;
         case SEQ:
             printf("seq r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            if (regs[instr.r_alpha] == o) regs[instr.r_beta] = 1;
-            else regs[instr.r_beta] = 0;
+            if (regs[instr.r_alpha] == o) 
+                regs[instr.r_beta] = 1;
+            else 
+                regs[instr.r_beta] = 0;
             break;
         case LOAD:
             printf("load r%d %d r%d\n", instr.r_alpha, o, instr.r_beta);
-            regs[instr.r_beta] = regs[instr.r_alpha + o];       
+            //TODO    
             break;
         case STORE:
             printf("store r%d %d r%d\n", instr.r_alpha, o, instr.r_beta);
-            regs[instr.r_alpha + o] = regs[instr.r_beta];       
+            //TODO    
             break;
         case JMP:
-            printf("(%d, %d, %d, %d)\n", instr.opcode, instr.imm, instr.o, instr.r);
+            printf("jmp %d r%d\n", instr.o, instr.r);
+            regs[instr.r] = instr_num + 1;
+            instr_num = instr.o;
             break;
         case BRAZ:
             printf("braz r%d, %d\n", instr.r, instr.a);
-            if (regs[instr.r] == 0) instr_num = instr.a;
+            if (regs[instr.r] == 0) 
+                instr_num = instr.a;
             break;
         case BRANZ:
             printf("branz r%d, %d\n", instr.r, instr.a);
-            if (regs[instr.r] != 0) instr_num = instr.a;
+            if (regs[instr.r] != 0) 
+                instr_num = instr.a;
             break;
         case SCALL:
             printf("(%d, %d)\n", instr.opcode, instr.a);
+            //TODO    
             break;
         default:
             printf("(%d, %d, %d, %d, %d)\n", instr.opcode, instr.r_alpha, instr.imm, instr.o, instr.r_beta);
             break;
     }
 
+    regs[0] = 0;
 }
 
 int main(int argc, const char* argv[]){
     FILE* ptrFile;
     char* filePath;
-    
+
     filePath = strcat(dirname(realpath(__FILE__, NULL)), "/../data.bin");
     ptrFile = openFile(filePath);
     instrs = parseFile(ptrFile);
 
     while(running){
         showRegs();
-        int32_t instr = fetch();
+        uint32_t instr = fetch();
         Instr_t instr_decode = decode(instr);
         eval(instr_decode);
     }
