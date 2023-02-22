@@ -24,63 +24,46 @@ Memory::Memory(){
 }
 
 Memory::~Memory(){
-
+    fclose(_memoryPtr);
 }
 
 int Memory::write(int addr, int data){
-    FILE* _memoryPtr = fopen(_memoryFile, "r");
-    FILE* _tmpPtr = fopen("./.memory.tmp.bin", "w");
+    char buf1[11] = "";
+    char buf2[11] = "";
 
-    char addrRead[11] = "";
-    char dataRead[11] = "";
+    fseek(_memoryPtr, 0, SEEK_SET);
 
     for (int i = 0; i < MEMORY_SIZE; i++){
-        fscanf(_memoryPtr, "%s %s\n", addrRead, dataRead);
-        if (addr == (int)strtol(addrRead, NULL, 0)){
-            fprintf(_tmpPtr, "0x%08x 0x%08x\n", addr, data);
+        if (addr == i){
+            fseek(_memoryPtr, 0, SEEK_CUR);
+            fprintf(_memoryPtr, "0x%08x 0x%08x", addr, data);
         }
-        else {
-            fprintf(_tmpPtr, "%s %s\n", addrRead, dataRead);
-        }
+        fscanf(_memoryPtr, "%s %s\n", buf1, buf2);
     }
 
-    fclose(_memoryPtr);
-    fclose(_tmpPtr);
-
-    remove(_memoryFile);
-    rename("./.memory.tmp.bin", _memoryFile);
-
-    if (read(addr) == data)
-        return 0;
-
-    return -1;
+    return 0;
 }
 
 int Memory::read(int addr){
-    FILE* _memoryPtr = fopen(_memoryFile, "r");
-
     char addrRead[11] = "";
     char dataRead[11] = "";
+
+    fseek(_memoryPtr, 0, SEEK_SET);
 
     for (int i = 0; i < MEMORY_SIZE; i++){
         fscanf(_memoryPtr, "%s %s", addrRead, dataRead);
         if (addr == (int)strtol(addrRead, NULL, 0)){
-            fclose(_memoryPtr);
             return (int)strtol(dataRead, NULL, 0);
 
         }
     }
-
-    fclose(_memoryPtr);
 }
 
 int Memory::init(){
-    FILE* _memoryPtr = fopen(_memoryFile, "w+");
+    _memoryPtr = fopen("./.memory.bin", "r+");
 
     for(int i = 0; i < MEMORY_SIZE; i++){
         fprintf(_memoryPtr, "0x%08x %s \n", i, "0x00000000");
     }
-
-    fclose(_memoryPtr);
 }
 

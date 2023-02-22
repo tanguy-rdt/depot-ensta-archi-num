@@ -280,12 +280,12 @@ int main(int argc, const char* argv[]){
     //memory test
     int dataRead = mem.read(2);
     printf("%d\n", dataRead);
-    int dataWrite = mem.write(2, 10);
+    int dataWrite = mem.write(30, 10);
     printf("%d\n", dataWrite);
     dataRead = mem.read(2);
     printf("%d\n", dataRead);
     //end memory test
-    
+
     FILE* ptrFile;
     char* filePath;
 

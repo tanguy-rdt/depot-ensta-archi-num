@@ -23,5 +23,5 @@ class Memory
     private: 
         int init();
 
-        char* _memoryFile = "./.memory.bin";
+        FILE* _memoryPtr;
 };
