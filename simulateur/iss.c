@@ -13,6 +13,9 @@
 #include <stdint.h>
 #include <libgen.h>
 
+#include "memory/memory.h"
+#include "cache/cache.h"
+
 #define STOP   0
 #define ADD    1
 #define SUB    2
@@ -272,6 +275,10 @@ void eval(Instr_t instr){
 
 
 int main(int argc, const char* argv[]){
+    //memory test
+    Memory mem;
+
+    //end memory test
     FILE* ptrFile;
     char* filePath;
 
