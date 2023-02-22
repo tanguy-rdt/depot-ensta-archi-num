@@ -1,4 +1,11 @@
-//TODO: gestion de la mem
+/********************************************************
+*                                                       *
+*    PROJECT: ISS in C                                  *
+*    ORGANIZATION: ENSTA Bretagne FIPASE 2024           *
+*    AUTEUR: Tanguy ROUDAUT, Melvin DUBEE               *
+*    DATE: 15/03/2023                                   *
+*                                                       *
+*********************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,7 +35,7 @@
 
 #define NB_REGS 32
 
-uint32_t regs[NB_REGS];
+int regs[NB_REGS];
 
 char **instrs = NULL;
 int instrNum = 0;
@@ -37,14 +44,14 @@ int cycleCnt = 0;
 int running = 1;
 
 typedef struct {
-    int32_t opcode;
-    int32_t imm;
-    int32_t r_beta;
-    int32_t r_alpha;
-    int32_t o;
-    int32_t r;
-    int32_t a;
-    int32_t n;
+    int opcode;
+    int imm;
+    int rBeta;
+    int rAlpha;
+    int o;
+    int r;
+    int a;
+    int n;
 } Instr_t;
 
 
@@ -89,21 +96,21 @@ void showCycle(){
 void showRegs(){
     printf("regs = ");
     for (int i = 0; i < NB_REGS; i++){
-        printf("0x%04X ", (regs[i] & 0x0000ffff));
+        printf("%04X ", (regs[i] & 0x0000ffff));
     }
     printf("\n");
 }
 
 
-uint32_t fetch(){
+int fetch(){
     char* instr = instrs[instrNum++];
-    return (uint32_t)strtol(instr, NULL, 0);
+    return (int)strtol(instr, NULL, 0);
 }
 
 
-Instr_t decode(uint32_t instr){
+Instr_t decode(int instr){
     Instr_t my_instr;
-    uint32_t opcode = (instr >> 27) & 0x0000001f;
+    int opcode = (instr >> 27) & 0x0000001f;
     my_instr.opcode = opcode;
 
     switch(opcode){
@@ -126,10 +133,10 @@ Instr_t decode(uint32_t instr){
             my_instr.n       = (instr)       & 0x001fffff;
             break;
         default:
-            my_instr.r_alpha = (instr >> 22) & 0x0000001f;
+            my_instr.rAlpha  = (instr >> 22) & 0x0000001f;
             my_instr.imm     = (instr >> 21) & 0x00000001;
-            my_instr.o       = (int16_t)(-(~((instr >> 5)  & 0x0000ffff)+1));
-            my_instr.r_beta  = (instr)       & 0x0000001f;
+            my_instr.o       = (char)((instr >> 5)  & 0x0000ffff);
+            my_instr.rBeta   = (instr)       & 0x0000001f;
             break;
     }
     return my_instr;
@@ -137,7 +144,7 @@ Instr_t decode(uint32_t instr){
 
 
 void eval(Instr_t instr){
-    uint32_t o;
+    int o;
     
     if (instr.imm) 
         o = instr.o;
@@ -150,81 +157,81 @@ void eval(Instr_t instr){
             printf("stop\n");
             break;
         case ADD:
-            printf("add r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            regs[instr.r_beta] = regs[instr.r_alpha] + o;
+            printf("add r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            regs[instr.rBeta] = regs[instr.rAlpha] + o;
             cycleCnt += 1;
             break;
         case SUB:
-            printf("sub r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            regs[instr.r_beta] = regs[instr.r_alpha] - o;
+            printf("sub r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            regs[instr.rBeta] = regs[instr.rAlpha] - o;
             cycleCnt += 1;
             break;
         case MUL:
-            printf("mul r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            regs[instr.r_beta] = regs[instr.r_alpha] * o;
+            printf("mul r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            regs[instr.rBeta] = regs[instr.rAlpha] * o;
             cycleCnt += 1;
             break;
         case DIV:
-            printf("div r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            regs[instr.r_beta] = regs[instr.r_alpha] / o;
+            printf("div r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            regs[instr.rBeta] = regs[instr.rAlpha] / o;
             cycleCnt += 1;
             break;
         case AND:
-            printf("and r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            regs[instr.r_beta] = regs[instr.r_alpha] & o;
+            printf("and r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            regs[instr.rBeta] = regs[instr.rAlpha] & o;
             cycleCnt += 1;
             break;
         case OR:
-            printf("or r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            regs[instr.r_beta] = (regs[instr.r_alpha] | o) + (regs[instr.r_alpha] & o);
+            printf("or r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            regs[instr.rBeta] = (regs[instr.rAlpha] | o) + (regs[instr.rAlpha] & o);
             cycleCnt += 1;
             break;
         case XOR:
-            printf("xor r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            regs[instr.r_beta] = (regs[instr.r_alpha] ^ o) + (regs[instr.r_alpha] & o);
+            printf("xor r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            regs[instr.rBeta] = (regs[instr.rAlpha] ^ o) + (regs[instr.rAlpha] & o);
             cycleCnt += 1;
             break;
         case SHL:
-            printf("shl r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            regs[instr.r_beta] = regs[instr.r_alpha] << o;
+            printf("shl r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            regs[instr.rBeta] = regs[instr.rAlpha] << o;
             cycleCnt += 1;
             break;
         case SHR:
-            printf("shr r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            regs[instr.r_beta] = regs[instr.r_alpha] >> o;
+            printf("shr r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            regs[instr.rBeta] = regs[instr.rAlpha] >> o;
             cycleCnt += 1;
             break;
         case SLT:
-            printf("slt r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            if (regs[instr.r_alpha] < o) 
-                regs[instr.r_beta] = 1;
+            printf("slt r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            if (regs[instr.rAlpha] < o) 
+                regs[instr.rBeta] = 1;
             else 
-                regs[instr.r_beta] = 0;
+                regs[instr.rBeta] = 0;
             cycleCnt += 1;
             break;
         case SLE:
-            printf("sle r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            if (regs[instr.r_alpha] <= o) 
-                regs[instr.r_beta] = 1;
+            printf("sle r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            if (regs[instr.rAlpha] <= o) 
+                regs[instr.rBeta] = 1;
             else 
-                regs[instr.r_beta] = 0;
+                regs[instr.rBeta] = 0;
             cycleCnt += 1;
             break;
         case SEQ:
-            printf("seq r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
-            if (regs[instr.r_alpha] == o) 
-                regs[instr.r_beta] = 1;
+            printf("seq r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            if (regs[instr.rAlpha] == o) 
+                regs[instr.rBeta] = 1;
             else 
-                regs[instr.r_beta] = 0;
+                regs[instr.rBeta] = 0;
             cycleCnt += 1;
             break;
         case LOAD:
-            printf("load r%d %d r%d\n", instr.r_alpha, o, instr.r_beta);
+            printf("load r%d %d r%d\n", instr.rAlpha, o, instr.rBeta);
             cycleCnt += 100;
             //TODO    
             break;
         case STORE:
-            printf("store r%d %d r%d\n", instr.r_alpha, o, instr.r_beta);
+            printf("store r%d %d r%d\n", instr.rAlpha, o, instr.rBeta);
             cycleCnt += 100;
             //TODO    
             break;
@@ -247,8 +254,16 @@ void eval(Instr_t instr){
             cycleCnt += 1;
             break;
         case SCALL:
-            printf("(%d, %d)\n", instr.opcode, instr.a);
-            //TODO    
+            printf("scall %d\n", instr.n);
+            if (instr.n) {
+                printf("Data in r1: %d\n", regs[1]);
+            }
+            else {
+                int val = 0;
+                printf("Data to set: ");
+                scanf("%d", &val);
+                regs[1] = val;
+            }
             break;
     }
 
@@ -267,7 +282,7 @@ int main(int argc, const char* argv[]){
     while(running){
         showRegs();
         showCycle();
-        uint32_t instr = fetch();
+        int instr = fetch();
         Instr_t instr_decode = decode(instr);
         eval(instr_decode);
     }
