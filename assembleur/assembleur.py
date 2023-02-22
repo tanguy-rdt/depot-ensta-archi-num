@@ -1,6 +1,8 @@
 import os
 import re
 
+from optparse import OptionParser
+
 label_addr = {}
 
 class EncodeInstr:
@@ -93,8 +95,8 @@ def parse_asm(fd):
             
     return data
 
-def open_bin_file():
-    bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../data.bin"))
+def open_output_file(output):
+    bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), output))
     fd = open(bin_path_file, "w")
     return fd
 
@@ -131,15 +133,45 @@ def get_instr_hex(instr_txt):
 def append_to_bin_file(fd, instr_num, instr_hex):
     instr_num_hex = '0x{0:08X}'.format(instr_num)
     line = instr_num_hex + ' ' + instr_hex
-    fd.write(line + "\n")    
-
-
+    fd.write(line + "\n")   
+            
     
 def main():
-    asm_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../data.asm"))
+    parser = OptionParser() 
+    
+    parser.add_option("-f", 
+                      "--file", 
+                      action="store", 
+                      type="string",
+                      dest="input_file", 
+                      help="Path of the asm file to translate", 
+                      metavar="INPUT_PATH")
+    
+    parser.add_option("-o", 
+                    "--output", 
+                    action="store", 
+                    type="string",
+                    dest="output_file", 
+                    help="Path of the binary output file", 
+                    metavar="OUTUT_PATH")
+    
+    (options, args) = parser.parse_args()
+    
+    if (not options.input_file):
+        parser.print_help()
+        exit(0)     
+        
+    asm_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), options.input_file))
     asm_fd = open_asm(asm_path_file)
     instrs_txt = parse_asm(asm_fd)
-    fd_binary = open_bin_file()
+    
+    if (not options.output_file):
+        bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), options.input_file + '.bin'))
+        fd_binary = open_output_file(bin_path_file)
+    else:
+        bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), options.output_file))
+        fd_binary = open_output_file(bin_path_file)
+        
     for instr_txt in instrs_txt:
         instr_hex = get_instr_hex(instr_txt)
         append_to_bin_file(fd_binary, instrs_txt.index(instr_txt), instr_hex)
