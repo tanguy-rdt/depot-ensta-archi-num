@@ -15,7 +15,7 @@
 
 
 Memory::Memory(){
-    int ret = initialize();
+    int ret = init();
 
     if (!ret){
         printf("Failed to init the memory");
@@ -74,7 +74,7 @@ int Memory::read(int addr){
     fclose(_memoryPtr);
 }
 
-int Memory::initialize(){
+int Memory::init(){
     FILE* _memoryPtr = fopen(_memoryFile, "w+");
 
     for(int i = 0; i < MEMORY_SIZE; i++){

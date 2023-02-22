@@ -21,7 +21,7 @@ class Memory
         int read(int addr);
 
     private: 
-        int initialize();
+        int init();
 
         char* _memoryFile = "./.memory.bin";
 };
