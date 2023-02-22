@@ -18,10 +18,10 @@ class Memory
         ~Memory();
         
         int write(int addr, int data);
-        int read(int addr, int data);
+        int read(int addr);
 
     private: 
-        int initialize(int size, int nBitsData);
+        int initialize();
 
-        FILE* _memoryPtr;
+        char* _memoryFile = "./.memory.bin";
 };

@@ -38,6 +38,8 @@
 
 #define NB_REGS 32
 
+Memory mem;
+
 int regs[NB_REGS];
 
 char **instrs = NULL;
@@ -276,9 +278,14 @@ void eval(Instr_t instr){
 
 int main(int argc, const char* argv[]){
     //memory test
-    Memory mem;
-
+    int dataRead = mem.read(2);
+    printf("%d\n", dataRead);
+    int dataWrite = mem.write(2, 10);
+    printf("%d\n", dataWrite);
+    dataRead = mem.read(2);
+    printf("%d\n", dataRead);
     //end memory test
+    
     FILE* ptrFile;
     char* filePath;
 
