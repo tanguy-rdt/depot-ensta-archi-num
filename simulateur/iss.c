@@ -13,7 +13,8 @@
 #include <stdint.h>
 #include <libgen.h>
 
-#include "memory/memory.h"
+#include <sys/time.h>
+
 #include "cache/cache.h"
 
 #define STOP   0
@@ -38,7 +39,7 @@
 
 #define NB_REGS 32
 
-Memory mem;
+Cache cache;
 
 int regs[NB_REGS];
 
@@ -277,14 +278,45 @@ void eval(Instr_t instr){
 
 
 int main(int argc, const char* argv[]){
-    //memory test
-    int dataRead = mem.read(2);
-    printf("%d\n", dataRead);
-    int dataWrite = mem.write(30, 10);
-    printf("%d\n", dataWrite);
-    dataRead = mem.read(2);
-    printf("%d\n", dataRead);
-    //end memory test
+    //cache test
+    struct timeval start, end;
+
+    gettimeofday(&start, NULL);
+    cache.write(2, 5);
+    gettimeofday(&end, NULL);
+    printf("Value to write: %d in %d, exec time: %d us\n", 2, 5, end.tv_usec-start.tv_usec);
+
+    gettimeofday(&start, NULL);
+    cache.write(3, 4);
+    gettimeofday(&end, NULL);
+    printf("Value to write: %d in %d, exec time: %d us\n", 3, 4, end.tv_usec-start.tv_usec);
+
+    gettimeofday(&start, NULL);
+    int a = cache.read(2);
+    gettimeofday(&end, NULL);
+    printf("Value read: %d in %d, exec time: %d us (in cache)\n", a, 2, end.tv_usec-start.tv_usec);
+
+    gettimeofday(&start, NULL);
+    a = cache.read(3);
+    gettimeofday(&end, NULL);
+    printf("Value read: %d in %d, exec time: %d us (in cache)\n", a, 3, end.tv_usec-start.tv_usec);
+
+    gettimeofday(&start, NULL);
+    a = cache.read(4);
+    gettimeofday(&end, NULL);
+    printf("Value read: %d in %d, exec time: %d us (not in cache)\n", a, 4, end.tv_usec-start.tv_usec);
+
+    gettimeofday(&start, NULL);
+    cache.write(4, 10);
+    gettimeofday(&end, NULL);
+    printf("Value to write: %d in %d, exec time: %d us\n", 4, 10, end.tv_usec-start.tv_usec);
+
+    gettimeofday(&start, NULL);
+    a = cache.read(4);
+    gettimeofday(&end, NULL);
+    printf("Value read: %d in %d, exec time: %d us (in cache)\n", a, 4, end.tv_usec-start.tv_usec);
+    printf("\n\n");
+    //end cache test
 
     FILE* ptrFile;
     char* filePath;
