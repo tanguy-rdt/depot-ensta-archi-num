@@ -233,13 +233,13 @@ void eval(Instr_t instr){
             break;
         case LOAD:
             printf("load r%d %d r%d\n", instr.rAlpha, o, instr.rBeta);
+            regs[instr.rBeta] = cache.read(instr.rAlpha + instr.o);
             cycleCnt += 100;
-            //TODO    
             break;
         case STORE:
             printf("store r%d %d r%d\n", instr.rAlpha, o, instr.rBeta);
-            cycleCnt += 100;
-            //TODO    
+            cache.write(instr.rAlpha + instr.o, regs[instr.rBeta]);
+            cycleCnt += 100;  
             break;
         case JMP:
             printf("jmp %d r%d\n", instr.o, instr.r);
@@ -278,46 +278,6 @@ void eval(Instr_t instr){
 
 
 int main(int argc, const char* argv[]){
-    //cache test
-    struct timeval start, end;
-
-    gettimeofday(&start, NULL);
-    cache.write(2, 5);
-    gettimeofday(&end, NULL);
-    printf("Value to write: %d in %d, exec time: %d us\n", 2, 5, end.tv_usec-start.tv_usec);
-
-    gettimeofday(&start, NULL);
-    cache.write(3, 4);
-    gettimeofday(&end, NULL);
-    printf("Value to write: %d in %d, exec time: %d us\n", 3, 4, end.tv_usec-start.tv_usec);
-
-    gettimeofday(&start, NULL);
-    int a = cache.read(2);
-    gettimeofday(&end, NULL);
-    printf("Value read: %d in %d, exec time: %d us (in cache)\n", a, 2, end.tv_usec-start.tv_usec);
-
-    gettimeofday(&start, NULL);
-    a = cache.read(3);
-    gettimeofday(&end, NULL);
-    printf("Value read: %d in %d, exec time: %d us (in cache)\n", a, 3, end.tv_usec-start.tv_usec);
-
-    gettimeofday(&start, NULL);
-    a = cache.read(4);
-    gettimeofday(&end, NULL);
-    printf("Value read: %d in %d, exec time: %d us (not in cache)\n", a, 4, end.tv_usec-start.tv_usec);
-
-    gettimeofday(&start, NULL);
-    cache.write(4, 10);
-    gettimeofday(&end, NULL);
-    printf("Value to write: %d in %d, exec time: %d us\n", 4, 10, end.tv_usec-start.tv_usec);
-
-    gettimeofday(&start, NULL);
-    a = cache.read(4);
-    gettimeofday(&end, NULL);
-    printf("Value read: %d in %d, exec time: %d us (in cache)\n", a, 4, end.tv_usec-start.tv_usec);
-    printf("\n\n");
-    //end cache test
-
     FILE* ptrFile;
     char* filePath;
 
