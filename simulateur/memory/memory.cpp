@@ -10,8 +10,9 @@
 
 #include "memory.h"
 
-#define MEMORY_SIZE 1000
-#define MEMORY_NB_BITS 32
+#define MEMORY_SIZE 1024 // en octet
+#define BLOCK_SIZE 8 // en octet soit int
+#define NB_BLOC MEMORY_SIZE/BLOCK_SIZE
 
 
 Memory::Memory(){
@@ -33,7 +34,7 @@ int Memory::write(int addr, int data){
 
     fseek(_memoryPtr, 0, SEEK_SET);
 
-    for (int i = 0; i < MEMORY_SIZE; i++){
+    for (int i = 0; i < NB_BLOC; i++){
         if (addr == i){
             fseek(_memoryPtr, 0, SEEK_CUR);
             fprintf(_memoryPtr, "0x%08x 0x%08x", addr, data);
@@ -50,7 +51,7 @@ int Memory::read(int addr){
 
     fseek(_memoryPtr, 0, SEEK_SET);
 
-    for (int i = 0; i < MEMORY_SIZE; i++){
+    for (int i = 0; i < NB_BLOC; i++){
         fscanf(_memoryPtr, "%s %s", addrRead, dataRead);
         if (addr == (int)strtol(addrRead, NULL, 0)){
             return (int)strtol(dataRead, NULL, 0);
@@ -60,9 +61,9 @@ int Memory::read(int addr){
 }
 
 int Memory::init(){
-    _memoryPtr = fopen("./.memory.bin", "r+");
+    _memoryPtr = fopen("./.memory.bin", "w+");
 
-    for(int i = 0; i < MEMORY_SIZE; i++){
+    for(int i = 0; i < NB_BLOC; i++){
         fprintf(_memoryPtr, "0x%08x %s \n", i, "0x00000000");
     }
 }
