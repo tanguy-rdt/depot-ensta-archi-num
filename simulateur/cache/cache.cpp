@@ -9,12 +9,12 @@
 
 #include "cache.h"
 
-Cache::Cache() // Constructeur
+Cache::Cache() 
 {
     init();
 }
 
-Cache::~Cache() // Destructeur
+Cache::~Cache()
 {
 }
 
