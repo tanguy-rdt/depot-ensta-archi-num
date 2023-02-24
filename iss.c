@@ -27,7 +27,7 @@
 
 int cycle_count = 0;
 
-int16_t regs[ NB_REGS ];
+int regs[ NB_REGS ];
 
 char **instrs = NULL;
 int instr_num = 0;
@@ -35,14 +35,14 @@ int instr_num = 0;
 int running = 1;
 
 typedef struct {
-    int8_t opcode;
-    int16_t imm;
-    int16_t r_beta;
-    int16_t r_alpha;
-    int16_t o;
-    int16_t r;
-    int16_t a;
-    int16_t n;
+    int opcode;
+    int imm;
+    int r_beta;
+    int r_alpha;
+    int o;
+    int r;
+    int a;
+    int n;
 } Instr_t;
 
 FILE* openFile(char *pathFile)
@@ -84,7 +84,7 @@ void showRegs(){
     printf("regs = ");
     for (int i = 0; i < NB_REGS; i++)
     {
-        printf("%04X ", regs[i]);
+        printf("%04X ", regs[i] & 0x0000FFFF);
     }
     printf("\n");
 }
@@ -93,7 +93,7 @@ void showCycle(){
     printf("Cycle number = %d\n", cycle_count);
 }
 
-int32_t fetch(){
+int fetch(){
     char* instr = instrs[instr_num++];
     return (int)strtol(instr, NULL, 0);
 }
@@ -135,9 +135,8 @@ Instr_t decode(int instr)
 }
 
 void eval(Instr_t instr){
-    uint32_t o;
+    int o;
     
-
     if (instr.imm) 
     {
         o = instr.o;
@@ -177,39 +176,10 @@ void eval(Instr_t instr){
             break;
 
         case DIV:
-             if (regs[instr.r_alpha] & 0x80000000)
-             {
-                if(o & 0x80000000)
-                {
-                    regs[instr.r_alpha] = -regs[instr.r_alpha];
-                    o = -o;
-                    regs[instr.r_beta] = (regs[instr.r_alpha] / o);
-                    regs[instr.r_alpha] = -regs[instr.r_alpha];
-                    o = -o;
-                }
-                else
-                {
-                    regs[instr.r_alpha] = -regs[instr.r_alpha];
-                    regs[instr.r_beta] = -(regs[instr.r_alpha] / o);
-                    regs[instr.r_alpha] = -regs[instr.r_alpha];
-                }
-             }
-             else if (o & 0x80000000)
-             {
-                o = -o;
-                regs[instr.r_beta] = -(regs[instr.r_alpha] / o);
-                o = -o;
-             }
-             else
-             {
-                regs[instr.r_beta] = (regs[instr.r_alpha] / o);
-             }
-             
-             cycle_count += 1;
-
+            regs[instr.r_beta] = (regs[instr.r_alpha] / o);
             printf("%d\n", regs[instr.r_beta]);
+            cycle_count += 1;
 
-            
              if (instr.imm)
             {
                 printf("div r%d %d r%d\n", instr.r_alpha, instr.o, instr.r_beta);
@@ -432,7 +402,7 @@ int main(int argc, const char* argv[])
     {
         showRegs();
         showCycle();
-        int32_t instr = fetch();
+        int instr = fetch();
         Instr_t instr_decode = decode(instr);
         eval(instr_decode);
     }
