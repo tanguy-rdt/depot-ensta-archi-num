@@ -50,7 +50,6 @@ int Memory::read(int addr){
         fscanf(_memoryPtr, "%s %s", addrRead, dataRead);
         if (addr == (int)strtol(addrRead, NULL, 0)){
             return (int)strtol(dataRead, NULL, 0);
-
         }
     }
 }

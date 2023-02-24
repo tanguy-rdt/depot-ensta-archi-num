@@ -34,7 +34,7 @@ class Cache
         typedef struct _cacheLines{
             int valid;
             int tag;
-            char data;
+            int data;
             int miss;
         } _cacheLines_t;
 
