@@ -281,7 +281,15 @@ int main(int argc, const char* argv[]){
     FILE* ptrFile;
     char* filePath;
 
-    filePath = strcat(dirname(realpath(__FILE__, NULL)), "/../data.bin");
+    if (argc != 2){
+        printf("Usage:\n");
+        printf("\t./iss <bin_file_path>\n");
+        exit(-1);
+    }
+    else {
+        filePath = realpath(argv[1], NULL);
+    }
+
     ptrFile = openFile(filePath);
     instrs = parseFile(ptrFile);
 

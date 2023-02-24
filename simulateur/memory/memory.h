@@ -7,8 +7,11 @@
 *                                                       *
 *********************************************************/
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <libgen.h>
 
 #define MEMORY_SIZE 1024 // en octet
 #define BLOCK_SIZE 4 // en octet soit int

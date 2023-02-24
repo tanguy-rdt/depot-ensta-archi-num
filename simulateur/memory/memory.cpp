@@ -55,7 +55,8 @@ int Memory::read(int addr){
 }
 
 int Memory::init(){
-    _memoryPtr = fopen("./.memory.bin", "w+");
+    char* filePath = strcat(dirname(realpath(__FILE__, NULL)), "/.memory.bin");
+    _memoryPtr = fopen(filePath, "w+");
 
     for(int i = 0; i < NB_BLOC; i++){
         fprintf(_memoryPtr, "0x%04x %s \n", i, "0x0000");
