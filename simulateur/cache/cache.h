@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "../memory/memory.h"
+#include "memory.h"
 
 #define CACHE_SIZE 104 // en octet
 #define BLOCK_SIZE 4 // en octet soit int

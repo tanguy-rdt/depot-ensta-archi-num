@@ -15,7 +15,7 @@
 
 #include <sys/time.h>
 
-#include "cache/cache.h"
+#include "cache.h"
 
 #define STOP   0
 #define ADD    1
