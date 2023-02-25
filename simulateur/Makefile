@@ -1,32 +1,33 @@
-CC = g++
-CFLAGS = -Wall -std=c++11
-SRC_DIR = .
-OBJ_DIR = obj
+SRC_DIR  = .
+OBJ_DIR  = ${SRC_DIR}/obj
 
-# List of source files
-SRCS = $(SRC_DIR)/iss.c \
-       $(SRC_DIR)/memory/memory.cpp \
-	   $(SRC_DIR)/cache/cache.cpp
+SRC_ISS    = ${SRC_DIR}/iss.c
+SRC_MEMORY = ${SRC_DIR}/memory/memory.cpp
+SRC_CACHE  = ${SRC_DIR}/cache/cache.cpp
+
+OBJ_MEMORY = ${OBJ_DIR}/memory/memory.o 
+OBJ_CACHE  = ${OBJ_DIR}/cache/cache.o 
+
+EXEC = ${SRC_DIR}/iss
+
+CC       = g++
+CFLAGS   = -Wall -std=c++11
+CPPFLAGS = -I${OBJ_MEMORY} -I${OBJ_CACHE}
 
 
-# Generate names of object files
-OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+all: ${EXEC}
 
-# Name of the executable file
-EXEC = iss
+${EXEC}: ${SRC_ISS} ${OBJ_MEMORY} ${OBJ_CACHE}
+	echo ${SRC_DIR}
+	${CC} ${CFLAGS} $^ -o $@
 
-.PHONY: all clean
+${OBJ_MEMORY}: ${SRC_MEMORY}
+	mkdir -p ${OBJ_DIR}/memory 
+	${CC} ${CFLAGS} -c $< -o $@
 
-all: $(EXEC)
-
-$(EXEC): $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $(OBJ_DIR)/memory \
-	         $(OBJ_DIR)/cache
-
-	$(CC) $(CFLAGS) -c $< -o $@
+${OBJ_CACHE}: ${SRC_CACHE}
+	mkdir -p ${OBJ_DIR}/cache
+	${CC} ${CFLAGS} -c $< -o $@
 
 clean:
-	rm -rf $(OBJ_DIR) $(EXEC)
+	rm -rf ${OBJ_DIR} ${EXEC}
