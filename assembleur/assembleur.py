@@ -2,6 +2,7 @@ import os
 import re
 
 from optparse import OptionParser
+from pathlib import Path
 
 label_addr = {}
 
@@ -70,9 +71,13 @@ class EncodeInstr:
     
 
 
-def open_asm(asm_file):
-    fd = open(asm_file, "r")
-    return fd
+def open_asm(asm_path_file):
+    try:
+        fd = open(asm_path_file, "r")
+        return fd
+    except Exception as err:
+        print("ERROR: Unable to find the asm file\n\t", err)
+        exit(2)
 
 def parse_asm(fd):
     comment = re.compile(r"^\s*#")
@@ -95,52 +100,63 @@ def parse_asm(fd):
             
     return data
 
-def open_output_file(output):
-    bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), output))
-    fd = open(bin_path_file, "w")
-    return fd
+def open_output_file(bin_path_file):
+    try:
+        fd = open(bin_path_file, "w")
+        return fd
+    except Exception as err:
+        print("ERROR: Unable to create the bin file\n\t", err)
+        exit(2)
 
-def get_instr_hex(instr_txt):
+def get_instr_hex(instr_txt, instr_num):
     encode = EncodeInstr(instr_txt)
     opcode_txt = instr_txt[0]    
     
     instr = 0
-    if opcode_txt == "jmp":
-        instr += encode.get_opcode() << 27
-        instr += encode.get_imm(index_o=1) << 26
-        instr += encode.get_o(index_o=1) << 5
-        instr += encode.get_r(index_r=2)
-    elif opcode_txt == "braz" or opcode_txt == "branz":
-        instr += encode.get_opcode() << 27
-        instr += encode.get_r(index_r=1) << 22
-        instr += encode.get_a()
-    elif opcode_txt == "scall":
-        instr += encode.get_opcode() << 27
-        instr += encode.get_n()
-    elif opcode_txt == "stop":
-        instr += encode.get_opcode() << 27
-    else:
-        instr += encode.get_opcode() << 27
-        instr += encode.get_r_alpha() << 22
-        instr += encode.get_imm(index_o=2) << 21
-        instr += encode.get_o(index_o=2) << 5
-        instr += encode.get_r_beta() 
     
-    instr = '0x{0:08X}'.format(instr)
+    try:
+        if opcode_txt == "jmp":
+            instr += encode.get_opcode() << 27
+            instr += encode.get_imm(index_o=1) << 26
+            instr += encode.get_o(index_o=1) << 5
+            instr += encode.get_r(index_r=2)
+        elif opcode_txt == "braz" or opcode_txt == "branz":
+            instr += encode.get_opcode() << 27
+            instr += encode.get_r(index_r=1) << 22
+            instr += encode.get_a()
+        elif opcode_txt == "scall":
+            instr += encode.get_opcode() << 27
+            instr += encode.get_n()
+        elif opcode_txt == "stop":
+            instr += encode.get_opcode() << 27
+        else:
+            instr += encode.get_opcode() << 27
+            instr += encode.get_r_alpha() << 22
+            instr += encode.get_imm(index_o=2) << 21
+            instr += encode.get_o(index_o=2) << 5
+            instr += encode.get_r_beta() 
     
-    return instr
+        instr = '0x{0:08X}'.format(instr)
+        
+        return instr
+    except Exception as err:
+        print("ERROR: Instruction number %d is not readable\n\t%s" %(instr_num, err))
+        exit(3)
 
 def append_to_bin_file(fd, instr_num, instr_hex):
     instr_num_hex = '0x{0:08X}'.format(instr_num)
     line = instr_num_hex + ' ' + instr_hex
-    fd.write(line + "\n")   
-            
+    try:
+        fd.write(line + "\n")   
+    except Exception as err:
+        print("ERROR: Unable to write in the bin file\n\t", err)
+        exit(3)            
     
 def main():
     parser = OptionParser() 
     
-    parser.add_option("-f", 
-                      "--file", 
+    parser.add_option("-i", 
+                      "--input", 
                       action="store", 
                       type="string",
                       dest="input_file", 
@@ -152,29 +168,28 @@ def main():
                     action="store", 
                     type="string",
                     dest="output_file", 
-                    help="Path of the binary output file", 
+                    help="Path of the binary file", 
                     metavar="OUTUT_PATH")
     
     (options, args) = parser.parse_args()
     
-    if (not options.input_file):
+    if (not options.input_file or not options.output_file):
         parser.print_help()
-        exit(0)     
+        exit(1)     
         
     asm_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), options.input_file))
     asm_fd = open_asm(asm_path_file)
     instrs_txt = parse_asm(asm_fd)
     
-    if (not options.output_file):
-        bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), options.input_file + '.bin'))
-        fd_binary = open_output_file(bin_path_file)
-    else:
-        bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), options.output_file))
-        fd_binary = open_output_file(bin_path_file)
+    bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), options.output_file))
+    fd_binary = open_output_file(bin_path_file)
         
     for instr_txt in instrs_txt:
-        instr_hex = get_instr_hex(instr_txt)
-        append_to_bin_file(fd_binary, instrs_txt.index(instr_txt), instr_hex)
+        instr_num = instrs_txt.index(instr_txt)
+        instr_hex = get_instr_hex(instr_txt, instr_num)
+        append_to_bin_file(fd_binary, instr_num, instr_hex)
+    
+    exit(0)
         
 
 if __name__ == '__main__':
