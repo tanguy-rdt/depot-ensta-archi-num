@@ -76,7 +76,7 @@ def open_asm(asm_path_file):
         fd = open(asm_path_file, "r")
         return fd
     except Exception as err:
-        print("ERROR: Unable to find the asm file\n\t", err)
+        print("ERROR: Unable to find the asm file\n%s" %(err))
         exit(2)
 
 def parse_asm(fd):
@@ -105,7 +105,7 @@ def open_output_file(bin_path_file):
         fd = open(bin_path_file, "w")
         return fd
     except Exception as err:
-        print("ERROR: Unable to create the bin file\n\t", err)
+        print("ERROR: Unable to create the bin file\n%s" %(err))
         exit(2)
 
 def get_instr_hex(instr_txt, instr_num):
@@ -140,7 +140,7 @@ def get_instr_hex(instr_txt, instr_num):
         
         return instr
     except Exception as err:
-        print("ERROR: Instruction number %d is not readable\n\t%s" %(instr_num, err))
+        print("ERROR: Instruction number %d is not valid\n%s" %(instr_num, err))
         exit(3)
 
 def append_to_bin_file(fd, instr_num, instr_hex):
@@ -149,7 +149,7 @@ def append_to_bin_file(fd, instr_num, instr_hex):
     try:
         fd.write(line + "\n")   
     except Exception as err:
-        print("ERROR: Unable to write in the bin file\n\t", err)
+        print("ERROR: Unable to write in the bin file\n%s" %(err))
         exit(3)            
     
 def main():
