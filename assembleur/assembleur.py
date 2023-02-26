@@ -1,9 +1,10 @@
 import os
 import re
-
+import logging
 from optparse import OptionParser
-from pathlib import Path
 
+
+exit_code = 0
 label_addr = {}
 
 class EncodeInstr:
@@ -69,20 +70,87 @@ class EncodeInstr:
     def get_n(self):
         return int(self.instr_txt[1])  
     
+    
+def options_parser():
+    parser = OptionParser() 
+    
+    parser.add_option("-i", 
+                      "--input", 
+                      action="store", 
+                      type="string",
+                      dest="input_file", 
+                      default="",
+                      help="Path of the asm file to translate", 
+                      metavar="INPUT_PATH")
+    
+    parser.add_option("-o", 
+                    "--output", 
+                    action="store", 
+                    type="string",
+                    dest="output_file", 
+                    default="",
+                    help="Path of the binary file", 
+                    metavar="OUTUT_PATH")
+    
+    parser.add_option("-l", 
+                    "--log", 
+                    action="store_true", 
+                    dest="log", 
+                    default=False,
+                    help="Genrate a log file")
+    
+    parser.add_option("-d", 
+                    "--debug", 
+                    action="store_true", 
+                    dest="debug", 
+                    default=False,
+                    help="Debug mode")
+    
+    (options, args) = parser.parse_args()
+    
+    if (not options.input_file or not options.output_file):
+        parser.print_help()
+        exit()  
+    
+    return options.input_file, options.output_file, options.log, options.debug
+    
+    
+def conf_logging(log, debug):
+    logging_level = None
+    if (debug):
+        logging_level = logging.DEBUG
+    else:
+        logging_level = logging.INFO
+        
+    if (log):
+        logging.basicConfig(filename='assembleur.log',
+                            format='%(asctime)s -- %(levelname)s -- %(message)s',
+                            datefmt='%Y-%m-%d, %H:%M:%S', 
+                            level=logging_level)
+    else:
+        logging.basicConfig(format='%(asctime)s -- %(levelname)s -- %(message)s',
+                            datefmt='%Y-%m-%d, %H:%M:%S', 
+                            level=logging_level)
 
 
 def open_asm(asm_path_file):
+    logging.info("Opening the asm file: %s" %(asm_path_file))
     try:
         fd = open(asm_path_file, "r")
         return fd
     except Exception as err:
-        print("ERROR: Unable to find the asm file\n%s" %(err))
-        exit(2)
-
+        logging.error("Unable to find the asm file: %s" %(err))
+        global exit_code
+        exit_code = 1
+        return None
+        
+        
 def parse_asm(fd):
     comment = re.compile(r"^\s*#")
     label = re.compile(r"^\w")
     linebreak = re.compile(r"\n|\r")
+    
+    logging.info("Parsing of the asm file")
     
     data = []
     for line in fd:        
@@ -100,20 +168,26 @@ def parse_asm(fd):
             
     return data
 
+
 def open_output_file(bin_path_file):
+    logging.info("Creation of the binary file: %s" %(bin_path_file))
     try:
         fd = open(bin_path_file, "w")
         return fd
     except Exception as err:
-        print("ERROR: Unable to create the bin file\n%s" %(err))
-        exit(2)
-
+        logging.error("Unable to create the bin file: %s" %(err))
+        global exit_code
+        exit_code = 2
+        return None
+      
+        
 def get_instr_hex(instr_txt, instr_num):
     encode = EncodeInstr(instr_txt)
     opcode_txt = instr_txt[0]    
     
     instr = 0
     
+    logging.debug("Conversion from str to hex of the instruction number %d: %s" %(instr_num, " ".join(instr_txt)))
     try:
         if opcode_txt == "jmp":
             instr += encode.get_opcode() << 27
@@ -137,60 +211,57 @@ def get_instr_hex(instr_txt, instr_num):
             instr += encode.get_r_beta() 
     
         instr = '0x{0:08X}'.format(instr)
+        logging.debug("Result of the conversion: %s" %(instr))
         
         return instr
     except Exception as err:
-        print("ERROR: Instruction number %d is not valid\n%s" %(instr_num, err))
-        exit(3)
-
+        logging.error("Instruction number %d is not valid: %s" %(instr_num, err))
+        global exit_code
+        exit_code = 3
+        return None
+        
+        
 def append_to_bin_file(fd, instr_num, instr_hex):
     instr_num_hex = '0x{0:08X}'.format(instr_num)
     line = instr_num_hex + ' ' + instr_hex
+    logging.debug("Append the instruction number %d in the binary file: %s" %(instr_num, instr_hex))
     try:
         fd.write(line + "\n")   
+        return True
     except Exception as err:
-        print("ERROR: Unable to write in the bin file\n%s" %(err))
-        exit(3)            
+        logging.error("Unable to write in the bin file: %s" %(err))
+        global exit_code
+        exit_code = 4
+        return None
+    
     
 def main():
-    parser = OptionParser() 
-    
-    parser.add_option("-i", 
-                      "--input", 
-                      action="store", 
-                      type="string",
-                      dest="input_file", 
-                      help="Path of the asm file to translate", 
-                      metavar="INPUT_PATH")
-    
-    parser.add_option("-o", 
-                    "--output", 
-                    action="store", 
-                    type="string",
-                    dest="output_file", 
-                    help="Path of the binary file", 
-                    metavar="OUTUT_PATH")
-    
-    (options, args) = parser.parse_args()
-    
-    if (not options.input_file or not options.output_file):
-        parser.print_help()
-        exit(1)     
+    input_file, output_file, log, debug = options_parser()
+    conf_logging(log, debug)
         
-    asm_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), options.input_file))
+    asm_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), input_file))
+    bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), output_file))
+    
     asm_fd = open_asm(asm_path_file)
-    instrs_txt = parse_asm(asm_fd)
+    if asm_fd:
+        instrs_txt = parse_asm(asm_fd)
+        fd_binary = open_output_file(bin_path_file)
+        if fd_binary:
+            logging.info("Start of assembly to binary translation")
+            for instr_txt in instrs_txt:
+                instr_num = instrs_txt.index(instr_txt)
+                instr_hex = get_instr_hex(instr_txt, instr_num)
+                if instr_hex:
+                    ret_append = append_to_bin_file(fd_binary, instr_num, instr_hex)
+                    if not ret_append:
+                        break
+                else:
+                    break
+            logging.info("End of assembly to binary translation")
     
-    bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), options.output_file))
-    fd_binary = open_output_file(bin_path_file)
-        
-    for instr_txt in instrs_txt:
-        instr_num = instrs_txt.index(instr_txt)
-        instr_hex = get_instr_hex(instr_txt, instr_num)
-        append_to_bin_file(fd_binary, instr_num, instr_hex)
-    
-    exit(0)
-        
+    logging.info("Exit code: %d" %(exit_code))
+    exit(exit_code)        
+
 
 if __name__ == '__main__':
     main()        
