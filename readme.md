@@ -49,7 +49,7 @@ Options:
 ```
 
 1. __`-l --log`__:\
-   Permet de diriger la sortie standart du programme vers le fichier _assembleur.log_
+   Permet de diriger la sortie standart du programme vers le fichier _assembleur.log_ \
    __Exemple:__
    ```
    $ python assembleur.py -i ../asm/data.asm -o ../bin/data.bin -l  
