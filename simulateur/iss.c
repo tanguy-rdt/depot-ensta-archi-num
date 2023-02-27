@@ -141,7 +141,7 @@ Instr_t decode(int instr){
         default:
             my_instr.rAlpha  = (instr >> 22) & 0x0000001f;
             my_instr.imm     = (instr >> 21) & 0x00000001;
-            my_instr.o       = (int)((instr >> 5)  & 0x0000ffff);
+            my_instr.o       = (int16_t)((instr >> 5)  & 0x0000ffff);
             my_instr.rBeta   = (instr)       & 0x0000001f;
             break;
     }
