@@ -141,7 +141,7 @@ Instr_t decode(int instr){
         default:
             my_instr.rAlpha  = (instr >> 22) & 0x0000001f;
             my_instr.imm     = (instr >> 21) & 0x00000001;
-            my_instr.o       = (char)((instr >> 5)  & 0x0000ffff);
+            my_instr.o       = (int)((instr >> 5)  & 0x0000ffff);
             my_instr.rBeta   = (instr)       & 0x0000001f;
             break;
     }
@@ -261,16 +261,18 @@ void eval(Instr_t instr){
             break;
         case SCALL:
             printf("scall %d\n", instr.n);
-            if (instr.n) {
-                printf("Data in r1: %d\n", regs[1]);
-            }
-            else {
+            if (instr.n == 0){
                 int val = 0;
                 printf("Data to set: ");
                 scanf("%d", &val);
                 regs[1] = val;
             }
-            break;
+            else if (instr.n == 1){
+                printf("Data in r1: %d\n", regs[1]);
+            }
+            else if (instr.n == 73){
+                    printf("Comming soon...");
+            }
     }
 
     regs[0] = 0;
