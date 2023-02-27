@@ -13,7 +13,7 @@
 #include "memory.h"
 
 #define CACHE_SIZE 104 // en octet
-#define BLOCK_SIZE 4 // en octet soit int
+#define BLOCK_SIZE 8 // en octet soit int
 #define NB_BLOC CACHE_SIZE/BLOCK_SIZE
 
 class Cache

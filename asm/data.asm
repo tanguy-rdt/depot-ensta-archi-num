@@ -1,5 +1,5 @@
         add  r0, 2,  r1    # presenté dans le slideware 0x09c00043
-        add  r0, 8,  r2    # additionner c'est bien
+        add  r0, -8,  r2    # additionner c'est bien
         add  r1, r2, r3
         add  r0, 4,  r31    # additionner c'est bien
 
@@ -17,6 +17,6 @@ label1:
         slt  r2, r1, r3
         sle  r1, r2, r4
         seq  r6, r9, r5
-        store r0, 10, r10
+        store r0, 10, r9
         load r0, 10, r11
         stop

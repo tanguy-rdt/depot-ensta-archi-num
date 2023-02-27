@@ -102,7 +102,7 @@ void showCycle(){
 void showRegs(){
     printf("regs = ");
     for (int i = 0; i < NB_REGS; i++){
-        printf("%04X ", (regs[i] & 0x0000ffff));
+        printf("%08x ", regs[i]);
     }
     printf("\n");
 }

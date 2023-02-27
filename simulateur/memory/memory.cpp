@@ -32,7 +32,7 @@ int Memory::write(int addr, int data){
     for (int i = 0; i < NB_BLOC; i++){
         if (addr == i){
             fseek(_memoryPtr, 0, SEEK_CUR);
-            fprintf(_memoryPtr, "0x%04x 0x%04x", addr, data);
+            fprintf(_memoryPtr, "0x%08x 0x%08x", addr, data);
         }
         fscanf(_memoryPtr, "%s %s\n", buf1, buf2);
     }
@@ -59,7 +59,7 @@ int Memory::init(){
     _memoryPtr = fopen(filePath, "w+");
 
     for(int i = 0; i < NB_BLOC; i++){
-        fprintf(_memoryPtr, "0x%04x %s \n", i, "0x0000");
+        fprintf(_memoryPtr, "0x%08x %s \n", i, "0x00000000");
     }
 }
 
