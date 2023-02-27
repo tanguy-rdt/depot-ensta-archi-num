@@ -146,7 +146,7 @@ def open_asm(asm_path_file):
         
         
 def parse_asm(fd):
-    comment = re.compile(r"^\s*#")
+    comment = re.compile(r"^\s*[#|;]")
     label = re.compile(r"^\w")
     linebreak = re.compile(r"\n|\r")
     
