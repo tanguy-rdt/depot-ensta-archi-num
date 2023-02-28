@@ -21,6 +21,7 @@ Memory::Memory(){
 
 Memory::~Memory(){
     fclose(_memoryPtr);
+    remove(strcat(dirname(realpath(__FILE__, NULL)), "/.memory.bin"));
 }
 
 int Memory::write(int addr, int data){
