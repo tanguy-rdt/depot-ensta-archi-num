@@ -146,24 +146,30 @@ def open_asm(asm_path_file):
         
         
 def parse_asm(fd):
-    comment = re.compile(r"^\s*[#|;]")
-    label = re.compile(r"^\w")
+    comment = re.compile(r"^([\s|\t])*;")
     linebreak = re.compile(r"\n|\r")
+    whitespace = re.compile(r"^[\s|\t]+$")
+    only_label = re.compile(r"^\w+:([\s|\t])*(;.*)?$")
+    label_and_instr = re.compile(r"^\w+:([\s|\t])*\w+")
     
     logging.info("Parsing of the asm file")
     
     data = []
     for line in fd:        
-        if comment.match(line) or linebreak.match(line):
+        if comment.match(line) or linebreak.match(line) or whitespace.match(line):
             continue
-        if label.match(line):
+        if only_label.match(line):
             label_addr[line[:line.index(':')]] = len(data)
-        else:
-            line = line.replace(',', ' ')
-            line = line.split()  
-            if '#' in line:
-                line = line[:line.index('#')]
-            data.append(line)
+            continue
+        if label_and_instr.match(line):
+            label_addr[line[:line.index(':')]] = len(data)
+            line = line[line.index(':')+1:]
+        
+        line = line.replace(',', ' ')
+        line = line.split()  
+        if ';' in line:
+            line = line[:line.index(';')]
+        data.append(line)
     fd.close()
             
     return data
@@ -181,14 +187,14 @@ def open_output_file(bin_path_file):
         return None
       
         
-def get_instr_hex(instr_txt, instr_num):
-    encode = EncodeInstr(instr_txt)
-    opcode_txt = instr_txt[0]    
-    
-    instr = 0
-    
+def get_instr_hex(instr_txt, instr_num):    
     logging.debug("Conversion from str to hex of the instruction number %d: %s" %(instr_num, " ".join(instr_txt)))
+    
     try:
+        encode = EncodeInstr(instr_txt)
+        opcode_txt = instr_txt[0]    
+        
+        instr = 0
         if opcode_txt == "jmp":
             instr += encode.get_opcode() << 27
             instr += encode.get_imm(index_o=1) << 26
@@ -248,8 +254,8 @@ def main():
         fd_binary = open_output_file(bin_path_file)
         if fd_binary:
             logging.info("Start of assembly to binary translation")
+            instr_num = 0
             for instr_txt in instrs_txt:
-                instr_num = instrs_txt.index(instr_txt)
                 instr_hex = get_instr_hex(instr_txt, instr_num)
                 if instr_hex:
                     ret_append = append_to_bin_file(fd_binary, instr_num, instr_hex)
@@ -257,6 +263,7 @@ def main():
                         break
                 else:
                     break
+                instr_num += 1
             logging.info("End of assembly to binary translation")
     
     logging.info("Exit code: %d" %(exit_code))
