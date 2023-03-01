@@ -1,4 +1,11 @@
-# Structure de fichier
+# Utilisation générale
+
+```bash
+$ chmod u+x init-env
+$ source init-env
+```
+
+## Structure de fichier
 
 ```
 ./
@@ -9,6 +16,7 @@
 ├── bin
 │   └── some bin example
 ├── readme.md
+├── init-env
 └── simulateur
     ├── cache
     │   ├── cache.cpp
@@ -24,10 +32,16 @@
 
 ## Utilisation 
 
-```bash
-$ cd assembleur
-$ python3 assembleur.py -i ../asm/data.asm -o ../bin/data.bin
-```
+- Depuis la racine du projet __sans__ `init-env`
+   ```bash
+   $ python3 assembleur/assembleur -i asm/data.asm -o bin/data.bin
+   ```
+
+- Depuis la racine du projet __avec__ `init-env`
+   ```bash
+   $ assembleur -i asm/data.asm -o bin/data.bin
+   ```
+
 
 Il est nécessaire de spécifier le chemin du fichier asm avec l'option `-i` et le chemin du fichier binaire avec `-o`. Sans ces informations le programme ne pourra pas s'executer.
 

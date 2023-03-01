@@ -238,9 +238,9 @@ def append_to_bin_file(fd, instr_num, instr_hex):
 def main():
     input_file, output_file, log, debug = options_parser()
     conf_logging(log, debug)
-        
-    asm_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), input_file))
-    bin_path_file = os.path.abspath(os.path.join(os.path.dirname(__file__), output_file))
+            
+    asm_path_file = os.path.join(os.getcwd(), input_file)
+    bin_path_file = os.path.join(os.getcwd(), output_file)
     
     asm_fd = open_asm(asm_path_file)
     if asm_fd:
