@@ -148,6 +148,13 @@ Instr_t decode(int instr){
     return my_instr;
 }
 
+void overflow(long val){
+     if ((val > (signed)0x7fffffff) || (val < (signed)0x80000000)){
+        printf("\n\nERROR: overflow");
+        exit(1);
+    }
+}
+
 
 void eval(Instr_t instr){
     int o;
@@ -164,16 +171,19 @@ void eval(Instr_t instr){
             break;
         case ADD:
             printf("add r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            overflow((long long)regs[instr.rAlpha] + o);
             regs[instr.rBeta] = regs[instr.rAlpha] + o;
             cycleCnt += 1;
             break;
         case SUB:
             printf("sub r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            overflow((long long)regs[instr.rAlpha] - o);
             regs[instr.rBeta] = regs[instr.rAlpha] - o;
             cycleCnt += 1;
             break;
         case MUL:
             printf("mul r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
+            overflow((long long)regs[instr.rAlpha] * o);
             regs[instr.rBeta] = regs[instr.rAlpha] * o;
             cycleCnt += 1;
             break;
