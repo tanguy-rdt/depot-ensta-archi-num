@@ -94,9 +94,10 @@ Options:
 Code de sortie | Information 
 ---------------|------------
 0              | Programme executer avec succés
-1              | Erreur lors de l'ouverture du fichier asm
-2              | Erreur lors de la création du fichier binaire
-3              | Erreur lors de la convertion de l'instruction en hexadécimal
-4              | Erreur lors de l'écriture dans le fichier binaire
+1              | Option -i et/ou -o non précisées
+2              | Erreur lors de l'ouverture du fichier asm
+3              | Erreur lors de la création du fichier binaire
+4              | Erreur lors de la convertion de l'instruction en hexadécimal
+5              | Erreur lors de l'écriture dans le fichier binaire
 
 # ISS

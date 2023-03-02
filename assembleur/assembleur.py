@@ -109,11 +109,13 @@ def options_parser():
     
     if (not options.input_file or not options.output_file):
         parser.print_help()
-        exit()  
+        print("\n")
+        conf_logging()
+        error(1, "You need to specify the input and output files")
     
     return options.input_file, options.output_file, options.log, options.debug
     
-def conf_logging(log, debug):
+def conf_logging(log=False, debug=False):
     logging_level = None
     if (debug):
         logging_level = logging.DEBUG
@@ -141,7 +143,7 @@ def open_asm(asm_path_file):
         fd = open(asm_path_file, "r")
         return fd
     except Exception as err:
-        error(1, "Unable to find the asm file: %s" %(err))
+        error(2, "Unable to find the asm file: %s" %(err))
         
 def parse_asm(fd):
     comment = re.compile(r"^([\s|\t])*;")
@@ -178,7 +180,7 @@ def open_output_file(bin_path_file):
         fd = open(bin_path_file, "w")
         return fd
     except Exception as err:
-        error(2, "Unable to create the bin file: %s" %(err))
+        error(3, "Unable to create the bin file: %s" %(err))
         
 def get_instr_hex(instr_txt, instr_num):    
     logging.debug("Conversion from str to hex of the instruction number %d: %s" %(instr_num, " ".join(instr_txt)))
@@ -214,7 +216,7 @@ def get_instr_hex(instr_txt, instr_num):
         
         return instr
     except Exception as err:
-        error(3, "Instruction number %d is not valid: %s" %(instr_num, err))        
+        error(4, "Instruction number %d is not valid: %s" %(instr_num, err))        
         
 def append_to_bin_file(fd, instr_num, instr_hex):
     instr_num_hex = '0x{0:08X}'.format(instr_num)
@@ -224,7 +226,7 @@ def append_to_bin_file(fd, instr_num, instr_hex):
         fd.write(line + "\n")   
         return True
     except Exception as err:
-        error(4, "Unable to write in the bin file: %s" %(err))
+        error(5, "Unable to write in the bin file: %s" %(err))
     
 def main():
     input_file, output_file, log, debug = options_parser()
