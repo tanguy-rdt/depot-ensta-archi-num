@@ -1,43 +1,24 @@
 # Utilisation générale
 
 ```bash
-$ chmod u+x init-env
-$ source init-env
+$ chmod u+x set-env.sh unset-env.sh 
+$ source set-env.sh
 ```
 
-## Structure de fichier
-
-```
-./
-├── asm
-│   └── some asm example
-├── assembleur
-│   └── assembleur.py
-├── bin
-│   └── some bin example
-├── readme.md
-├── init-env
-└── simulateur
-    ├── cache
-    │   ├── cache.cpp
-    │   └── cache.h
-    ├── iss.c
-    ├── Makefile
-    └── memory
-        ├── memory.cpp
-        └── memory.h
+```bash
+$ source unset-env.sh
 ```
     
 # Assembleur
 
 ## Utilisation 
 
-- Depuis la racine du projet __sans__ `init-env`
+- Depuis la racine du projet __sans__ `set-env`
    ```bash
    $ python3 assembleur/assembleur -i asm/data.asm -o bin/data.bin
    ```
 
-- Depuis la racine du projet __avec__ `init-env`
+- Depuis la racine du projet __avec__ `set-env`
    ```bash
    $ assembleur -i asm/data.asm -o bin/data.bin
    ```
@@ -89,6 +70,35 @@ Options:
    2023-02-26, 22:25:26 -- INFO -- End of assembly to binary translation
    2023-02-26, 22:25:26 -- INFO -- Exit code: 3
    ```
+
+## Syntaxe asm
+1. __Commentaire__:
+   - Les commentaires sont identifiés avec le caractère `;`, tous textes qui suit ce caractèrre sera ignoré. 
+   - Le commentaire peut être collé ou espacer du caractère `;`.
+   - Ils peuvent être placé à n'importe quel endroit.
+  
+2. __Label__:
+   - Les labels doivent contenir au moins un caractère suivit de `:`, sans espace.
+   - Les labels doivent obligatoirements être précedé d'un retour à la ligne, il est important que ce soit le premier élément de la ligne.
+   - Les labels peuvent être suivit d'un commentaire, d'une instruction, d'espaces ou d'un retour à la ligne
+  
+3. __Instruction__:
+   - Les instructions peuvent être précédé par un label
+   - Les instructions doivent obligatoirement être précédé d'une tabulation si la ligne contient uniquement l'instruction et optionellement un commentaire
+
+__Exemple:__
+   ```asms
+         ; add  r0, 4,  r31 
+   label2: sub  r31, 2,  r31 ; comment
+         sub  r2, r1, r4
+
+   label4: ; comment
+         sub  r2, r1, r4
+
+         stop
+   ```
+
+
 ## Gestion des Erreurs
 
 Code de sortie | Information 
@@ -100,4 +110,30 @@ Code de sortie | Information
 4              | Erreur lors de la convertion de l'instruction en hexadécimal
 5              | Erreur lors de l'écriture dans le fichier binaire
 
+
 # ISS
+## Utilisation 
+
+- Depuis la racine du projet __sans__ `set-env`
+   ```bash
+   $ make -C simulateur
+   $ ./simulateur/iss -i asm/data.asm -o bin/data.bin
+   ```
+
+- Depuis la racine du projet __avec__ `set-env`
+   ```bash
+   $ make -C simulateur
+   $ iss -i asm/data.asm -o bin/data.bin
+   ```
+
+
+Il est nécessaire de spécifier le chemin du fichier binaire. Sans cette information le programme ne pourra pas s'executer.
+
+## Gestion des Erreurs
+
+Code de sortie | Information 
+---------------|------------
+0              | Programme executer avec succés
+1              | Fichier binaire non précisé
+2              | Erreur lors de l'ouverture du fichier binaire
+3              | Dépassement du registre _(overflow)_
