@@ -4,7 +4,6 @@ import logging
 from optparse import OptionParser
 
 
-exit_code = 0
 label_addr = {}
 
 class EncodeInstr:
@@ -114,7 +113,6 @@ def options_parser():
     
     return options.input_file, options.output_file, options.log, options.debug
     
-    
 def conf_logging(log, debug):
     logging_level = None
     if (debug):
@@ -131,7 +129,11 @@ def conf_logging(log, debug):
         logging.basicConfig(format='%(asctime)s -- %(levelname)s -- %(message)s',
                             datefmt='%Y-%m-%d, %H:%M:%S', 
                             level=logging_level)
-
+        
+def error(error_code, msg):
+    logging.error(msg)
+    logging.info("Exit code: %d" %(error_code))
+    exit(error_code)
 
 def open_asm(asm_path_file):
     logging.info("Opening the asm file: %s" %(asm_path_file))
@@ -139,11 +141,7 @@ def open_asm(asm_path_file):
         fd = open(asm_path_file, "r")
         return fd
     except Exception as err:
-        logging.error("Unable to find the asm file: %s" %(err))
-        global exit_code
-        exit_code = 1
-        return None
-        
+        error(1, "Unable to find the asm file: %s" %(err))
         
 def parse_asm(fd):
     comment = re.compile(r"^([\s|\t])*;")
@@ -174,18 +172,13 @@ def parse_asm(fd):
             
     return data
 
-
 def open_output_file(bin_path_file):
     logging.info("Creation of the binary file: %s" %(bin_path_file))
     try:
         fd = open(bin_path_file, "w")
         return fd
     except Exception as err:
-        logging.error("Unable to create the bin file: %s" %(err))
-        global exit_code
-        exit_code = 2
-        return None
-      
+        error(2, "Unable to create the bin file: %s" %(err))
         
 def get_instr_hex(instr_txt, instr_num):    
     logging.debug("Conversion from str to hex of the instruction number %d: %s" %(instr_num, " ".join(instr_txt)))
@@ -221,11 +214,7 @@ def get_instr_hex(instr_txt, instr_num):
         
         return instr
     except Exception as err:
-        logging.error("Instruction number %d is not valid: %s" %(instr_num, err))
-        global exit_code
-        exit_code = 3
-        return None
-        
+        error(3, "Instruction number %d is not valid: %s" %(instr_num, err))        
         
 def append_to_bin_file(fd, instr_num, instr_hex):
     instr_num_hex = '0x{0:08X}'.format(instr_num)
@@ -235,11 +224,7 @@ def append_to_bin_file(fd, instr_num, instr_hex):
         fd.write(line + "\n")   
         return True
     except Exception as err:
-        logging.error("Unable to write in the bin file: %s" %(err))
-        global exit_code
-        exit_code = 4
-        return None
-    
+        error(4, "Unable to write in the bin file: %s" %(err))
     
 def main():
     input_file, output_file, log, debug = options_parser()
@@ -249,25 +234,19 @@ def main():
     bin_path_file = os.path.join(os.getcwd(), output_file)
     
     asm_fd = open_asm(asm_path_file)
-    if asm_fd:
-        instrs_txt = parse_asm(asm_fd)
-        fd_binary = open_output_file(bin_path_file)
-        if fd_binary:
-            logging.info("Start of assembly to binary translation")
-            instr_num = 0
-            for instr_txt in instrs_txt:
-                instr_hex = get_instr_hex(instr_txt, instr_num)
-                if instr_hex:
-                    ret_append = append_to_bin_file(fd_binary, instr_num, instr_hex)
-                    if not ret_append:
-                        break
-                else:
-                    break
-                instr_num += 1
-            logging.info("End of assembly to binary translation")
+    instrs_txt = parse_asm(asm_fd)
+    fd_binary = open_output_file(bin_path_file)
     
-    logging.info("Exit code: %d" %(exit_code))
-    exit(exit_code)        
+    logging.info("Start of assembly to binary translation")
+    instr_num = 0
+    for instr_txt in instrs_txt:
+        instr_hex = get_instr_hex(instr_txt, instr_num)
+        append_to_bin_file(fd_binary, instr_num, instr_hex)
+        instr_num += 1
+    logging.info("End of assembly to binary translation")
+    
+    logging.info("Exit code: %d" %(0))
+    exit(0)        
 
 
 if __name__ == '__main__':
