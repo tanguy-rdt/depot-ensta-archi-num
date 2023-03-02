@@ -251,7 +251,10 @@ void eval(Instr_t instr){
         case LOAD:
             printf("load r%d %d r%d\n", instr.rAlpha, o, instr.rBeta);
             regs[instr.rBeta] = cache.read(instr.rAlpha + instr.o);
-            cycleCnt += 100;
+            if (cache.getCacheMiss())
+                cycleCnt += 100;
+            else
+                cycleCnt += 2;
             break;
         case STORE:
             printf("store r%d %d r%d\n", instr.rAlpha, o, instr.rBeta);
@@ -262,7 +265,7 @@ void eval(Instr_t instr){
             printf("jmp %d r%d\n", instr.o, instr.r);
             regs[instr.r] = instrNum + 1;
             instrNum = instr.o;
-            cycleCnt += 100;
+            cycleCnt += 1;
             break;
         case BRAZ:
             printf("braz r%d, %d\n", instr.r, instr.a);

@@ -49,6 +49,7 @@ int Cache::read(int addr){
         }
         _line[i].miss++;
     }
+    _cacheMiss = 1;
 
     int indexLineHigherCacheMiss = _line[0].miss;
     for (int i = 0; i < NB_BLOC; i++) {
@@ -69,6 +70,12 @@ int Cache::read(int addr){
     _line[indexLineHigherCacheMiss].tag = addr;
     _line[indexLineHigherCacheMiss].miss = 0;
     return _line[indexLineHigherCacheMiss].data;
+}
+
+int Cache::getCacheMiss(){
+    int lastCacheMiss = _cacheMiss;
+    _cacheMiss = 0;
+    return lastCacheMiss;
 }
 
 int Cache::writeThrough(int addr, int data){

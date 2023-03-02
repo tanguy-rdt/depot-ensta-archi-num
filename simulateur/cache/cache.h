@@ -24,6 +24,7 @@ class Cache
 
         int write(int addr, int data);
         int read(int addr);
+        int getCacheMiss();
 
     private: 
         int writeThrough(int addr, int data);
@@ -40,5 +41,5 @@ class Cache
 
         _cacheLines_t _line[NB_BLOC];
 
-
+        int _cacheMiss = 0;
 };
