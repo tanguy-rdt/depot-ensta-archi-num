@@ -1,0 +1,6 @@
+[book]
+authors = ["Tanguy ROUDAUT", "Melvin DUBEE"]
+language = "fr"
+multilingual = true
+src = "src"
+title = "ISS in C - Melvin DUBEE & Tanguy ROUDAUT - FIPASE24"
