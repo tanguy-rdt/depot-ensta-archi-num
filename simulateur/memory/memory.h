@@ -14,7 +14,7 @@
 #include <libgen.h>
 
 #define MEMORY_SIZE 1024 // en octet
-#define BLOCK_SIZE 8 // en octet soit int
+#define BLOCK_SIZE 4 // en octet soit int
 #define NB_BLOC MEMORY_SIZE/BLOCK_SIZE
 
 
