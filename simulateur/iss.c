@@ -60,13 +60,20 @@ typedef struct {
     int n;
 } Instr_t;
 
+void error(int errorCode, FILE* msg){
+    printf("%s\n", msg);
+    printf("Exit code: %d\n", errorCode);
+    exit(errorCode);
+}
+
 
 FILE* openFile(char *pathFile){
     FILE* ptr;
     ptr = fopen(pathFile, "r");
-    
+
     if (ptr == NULL){
-        printf("Unable to read the file");
+        fprintf(stderr, "ERROR: Unable to open the file: %s", pathFile);
+        error(2, stderr);
     }
     else {
         return ptr;
@@ -150,8 +157,8 @@ Instr_t decode(int instr){
 
 void overflow(long val){
      if ((val > (signed)0x7fffffff) || (val < (signed)0x80000000)){
-        printf("\n\nERROR: overflow");
-        exit(1);
+        fprintf(stderr, "ERROR: overflow");
+        error(3, stderr);
     }
 }
 
@@ -290,13 +297,14 @@ void eval(Instr_t instr){
 
 
 int main(int argc, const char* argv[]){
-    FILE* ptrFile;
-    char* filePath;
+    FILE* ptrFile = NULL;
+    char* filePath = NULL;
 
     if (argc != 2){
         printf("Usage:\n");
-        printf("\t./iss <bin_file_path>\n");
-        exit(-1);
+        printf("\t./iss <bin_file_path>\n\n");
+        fprintf(stderr, "ERROR: You need to specify the input file");
+        error(1, stderr);
     }
     else {
         filePath = realpath(argv[1], NULL);
