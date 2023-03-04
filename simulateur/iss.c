@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <libgen.h>
+#include <unistd.h>
 
 #include <sys/time.h>
 
@@ -290,8 +291,15 @@ void eval(Instr_t instr){
             else if (instr.n == 1){
                 printf("Data in r1: %d\n", regs[1]);
             }
-            else if (instr.n == 73){
-                    printf("Comming soon...");
+            else if (instr.n == 2){
+                int pidScreen = fork();
+                if (pidScreen == 0){
+                    execlp("python3", "python3", strcat(dirname(realpath(__FILE__, NULL)), "/screen/screen.py"), NULL);
+                }
+                else if (pidScreen == -1){
+                    fprintf(stderr, "ERROR: Failed to create the screen process");
+                    error(4, stderr);
+                }
             }
     }
 
