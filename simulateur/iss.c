@@ -13,7 +13,6 @@
 #include <stdint.h>
 #include <libgen.h>
 #include <unistd.h>
-
 #include <sys/time.h>
 
 #include "cache.h"
@@ -193,12 +192,12 @@ void eval(Instr_t instr){
             printf("mul r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             overflow((long long)regs[instr.rAlpha] * o);
             regs[instr.rBeta] = regs[instr.rAlpha] * o;
-            cycleCnt += 1;
+            cycleCnt += 2;
             break;
         case DIV:
             printf("div r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             regs[instr.rBeta] = regs[instr.rAlpha] / o;
-            cycleCnt += 1;
+            cycleCnt += 2;
             break;
         case AND:
             printf("and r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
@@ -308,6 +307,8 @@ void eval(Instr_t instr){
 
 
 int main(int argc, const char* argv[]){
+    struct timeval start, end;
+
     FILE* ptrFile = NULL;
     char* filePath = NULL;
 
@@ -324,6 +325,7 @@ int main(int argc, const char* argv[]){
     ptrFile = openFile(filePath);
     instrs = parseFile(ptrFile);
 
+    gettimeofday(&start, 0);
     while(running){
         showRegs();
         showCycle();
@@ -331,6 +333,12 @@ int main(int argc, const char* argv[]){
         Instr_t instr_decode = decode(instr);
         eval(instr_decode);
     }
+    gettimeofday(&end, 0);
+
+    long time = end.tv_usec - start.tv_usec;
+    printf("\n\n\nElapsed time %ldus for %d cycle\n", time, cycleCnt);
+    long mips = (cycleCnt / (time * 0.000001));
+    printf("Estimated MIPS: %d million par seconde", mips);
 
     return 0;
 }
