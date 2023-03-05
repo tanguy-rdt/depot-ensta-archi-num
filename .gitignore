@@ -256,3 +256,6 @@ poetry.toml
 
 ### Sandbox ###
 sandbox/
+
+### Memory ###
+simulateur/memory/.memory.bin 
