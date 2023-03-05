@@ -262,9 +262,9 @@ void eval(Instr_t instr){
             cycleCnt += 100;  
             break;
         case JMP:
-            printf("jmp %d r%d\n", instr.o, instr.r);
-            regs[instr.r] = instrNum + 1;
-            instrNum = instr.o;
+            printf("jmp %d r%d\n", o, instr.r);
+            regs[instr.r] = instrNum;
+            instrNum = o;
             cycleCnt += 1;
             break;
         case BRAZ:
