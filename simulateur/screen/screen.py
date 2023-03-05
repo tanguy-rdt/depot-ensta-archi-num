@@ -1,9 +1,8 @@
 import os
-import time
 
 from PySide6.QtCore import QFileSystemWatcher
 from PySide6.QtWidgets import QApplication, QMainWindow, QLabel
-from PySide6.QtGui import QPixmap, QColor, QImage, QPainter, QPen
+from PySide6.QtGui import QPixmap, QColor, QImage
 
         
 class Memory():
@@ -32,49 +31,36 @@ class Screen(QMainWindow):
         
         assert isinstance(mem, Memory)
         self.memory = mem
-        self.width, self.height, self.size_factor, self.grid_state = self.get_init_parameter(self.memory.data_memory)
-        self.size_factor = 30
+        self.width, self.height, self.size_factor = self.get_init_parameter(self.memory.data_memory)
         self.pixels = []
+        
     
-    def update_image(self):
+    def create_image(self):
         image = QImage(self.width, self.height, QImage.Format_RGB32)
+        for x in range(self.width):
+            for y in range(self.height):
+                image.setPixelColor(x, y, QColor('white'))
         for px in self.pixels:
-            r = (px.get("color") >> 16) & 0x000000ff
-            g = (px.get("color") >> 8) & 0x000000ff
-            b = px.get("color") & 0x000000ff
-            image.setPixelColor(px.get('x'), px.get('y'), QColor(r, g, b))
+            image.setPixelColor(px.get('x'), px.get('y'), QColor('black'))
         return image
     
     def get_init_parameter(self, data_memory):
-        width = data_memory[0] & 0x0000000f
-        height = (data_memory[0] >> 4) & 0x0000000f
-        size_factor = ((data_memory[0] >> 8) & 0x0000000f | ((data_memory[0] >> 12) & 0x0000000f << 4))
-        grid_state = (data_memory[0] >> 16) & 0x0000000f
-        return width, height, size_factor, grid_state
+        height = data_memory[0] & 0x00000fff
+        width = (data_memory[0] >> 12) & 0x00000fff
+        size_factor = (data_memory[0] >> 24) & 0x0000000f
+        if size_factor == 0:
+            size_factor = 1
+        return width, height, size_factor
     
     def get_px(self, data_memory):
         for px in data_memory[1:(self.width*self.height)+self.width+1]:
             px_parameter = {}
-            px_parameter["color"] = px & 0x00ffffff
-            px_parameter["y"] = (px >> 24) & 0x0000000f
-            px_parameter["x"] = (px >> 28) & 0x0000000f
+            px_parameter["y"] = px & 0x00000fff
+            px_parameter["x"] = (px >> 12) & 0x00000fff
             self.pixels.append(px_parameter)
             
     def image_to_pixmap(self, image):
         pixmap = QPixmap.fromImage(image).scaled(self.width*self.size_factor, self.height*self.size_factor)
-        return pixmap
-        
-    def add_grid(self, pixmap):
-        painter = QPainter(pixmap)
-        pen = QPen(QColor('gray'))
-        pen.setWidth(1)
-        painter.setPen(pen)
-        for x in range(self.width):
-            painter.drawLine(x * self.size_factor, 0, x * self.size_factor, self.height * self.size_factor)
-        for y in range(self.height):
-            painter.drawLine(0, y * self.size_factor, self.width * self.size_factor, y * self.size_factor)
-        painter.end()
-        
         return pixmap
         
     def show_pixmap(self, pixmap):
@@ -85,9 +71,8 @@ class Screen(QMainWindow):
 def on_memory_modified(memory_path, mem, screen):
     mem.read_memory()
     screen.get_px(mem.data_memory)
-    image = screen.update_image()
+    image = screen.create_image()
     pixmap = screen.image_to_pixmap(image)
-    screen.add_grid(pixmap)
     screen.show_pixmap(pixmap)
     screen.show()
     
@@ -95,7 +80,6 @@ def main():
     app = QApplication()
     
     memory_path = os.path.join(os.getcwd(), "memory/.memory.bin")
-    print(memory_path)
     mem = Memory(memory_path)
     screen = Screen(mem)
     on_memory_modified(memory_path, mem, screen)
