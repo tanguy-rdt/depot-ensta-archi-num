@@ -182,62 +182,25 @@ void showInstr(Instr_t instr){
     }
 
     switch (instr.opcode){
-        case STOP:
-            printf("stop");
-            break;
-        case ADD:
-            fprintf(stdout, instrStrMask, "add", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case SUB:
-            fprintf(stdout, instrStrMask, "sub", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case MUL:
-            fprintf(stdout, instrStrMask, "mul", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case DIV:
-            fprintf(stdout, instrStrMask, "div", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case AND:
-            fprintf(stdout, instrStrMask, "and", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case OR:
-            fprintf(stdout, instrStrMask, "or", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case XOR:
-            fprintf(stdout, instrStrMask, "xor", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case SHL:
-            fprintf(stdout, instrStrMask, "shl", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case SHR:
-            fprintf(stdout, instrStrMask, "shr", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case SLT:
-            fprintf(stdout, instrStrMask, "slt", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case SLE:
-            fprintf(stdout, instrStrMask, "sle", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case SEQ:
-            fprintf(stdout, instrStrMask, "seq", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case LOAD:
-            fprintf(stdout, instrStrMask, "load", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case STORE:
-            fprintf(stdout, instrStrMask, "store", instr.rAlpha, instr.o, instr.rBeta);
-            break;
-        case JMP:
-            fprintf(stdout, instrStrMask, "jmp", instr.o, instr.r);
-            break;
-        case BRAZ:
-            fprintf(stdout, instrStrMask, "braz", instr.r, instr.a);
-            break;
-        case BRANZ:
-            fprintf(stdout, instrStrMask, "branz", instr.r, instr.a);
-            break;
-        case SCALL:
-            fprintf(stdout, instrStrMask, "scall", instr.n);
+        case STOP:  fprintf(stdout, "%s", "stop");                                              break;
+        case ADD:   fprintf(stdout, instrStrMask, "add", instr.rAlpha, instr.o, instr.rBeta);   break;
+        case SUB:   fprintf(stdout, instrStrMask, "sub", instr.rAlpha, instr.o, instr.rBeta);   break;
+        case MUL:   fprintf(stdout, instrStrMask, "mul", instr.rAlpha, instr.o, instr.rBeta);   break;
+        case DIV:   fprintf(stdout, instrStrMask, "div", instr.rAlpha, instr.o, instr.rBeta);   break;
+        case AND:   fprintf(stdout, instrStrMask, "and", instr.rAlpha, instr.o, instr.rBeta);   break;
+        case OR:    fprintf(stdout, instrStrMask, "or", instr.rAlpha, instr.o, instr.rBeta);    break;
+        case XOR:   fprintf(stdout, instrStrMask, "xor", instr.rAlpha, instr.o, instr.rBeta);   break;
+        case SHL:   fprintf(stdout, instrStrMask, "shl", instr.rAlpha, instr.o, instr.rBeta);   break;
+        case SHR:   fprintf(stdout, instrStrMask, "shr", instr.rAlpha, instr.o, instr.rBeta);   break;
+        case SLT:   fprintf(stdout, instrStrMask, "slt", instr.rAlpha, instr.o, instr.rBeta);   break;
+        case SLE:   fprintf(stdout, instrStrMask, "sle", instr.rAlpha, instr.o, instr.rBeta);   break;
+        case SEQ:   fprintf(stdout, instrStrMask, "seq", instr.rAlpha, instr.o, instr.rBeta);   break;
+        case LOAD:  fprintf(stdout, instrStrMask, "load", instr.rAlpha, instr.o, instr.rBeta);  break;
+        case STORE: fprintf(stdout, instrStrMask, "store", instr.rAlpha, instr.o, instr.rBeta); break;
+        case JMP:   fprintf(stdout, instrStrMask, "jmp", instr.o, instr.r);                     break;
+        case BRAZ:  fprintf(stdout, instrStrMask, "braz", instr.r, instr.a);                    break;
+        case BRANZ: fprintf(stdout, instrStrMask, "branz", instr.r, instr.a);                   break;
+        case SCALL: fprintf(stdout, instrStrMask, "scall", instr.n);                            break;
     }
 
     printf("%s\n", stdout);
