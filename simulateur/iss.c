@@ -308,12 +308,11 @@ void eval(Instr_t instr){
         case SCALL:
             if (instr.n == 0){
                 int val = 0;
-                printf("Give value: ");
                 scanf("%d", &val);
                 regs[1] = val;
             }
             else if (instr.n == 1){
-                printf("%d\n", regs[1]);
+                printf("%d", regs[1]);
             }
             else if (instr.n == 2){
                 int pidScreen = fork();
@@ -326,7 +325,7 @@ void eval(Instr_t instr){
                 }
             }
             else if (instr.n == 3){
-                printf("%c\n", regs[1]);
+                printf("%c", regs[1]);
             }
             else if (instr.n == 4){
                 srand(time(NULL));
