@@ -162,7 +162,6 @@ void overflow(long val){
     }
 }
 
-
 void eval(Instr_t instr){
     int o;
     
@@ -305,6 +304,12 @@ void eval(Instr_t instr){
     regs[0] = 0;
 }
 
+void showMips(long execTime){
+    printf("\n\n\nElapsed time %ldus for %d cycle\n", execTime, cycleCnt);
+    long mips = (cycleCnt / (execTime * 0.000001));
+    printf("Estimated MIPS: %d million par seconde", mips);
+}
+
 
 int main(int argc, const char* argv[]){
     struct timeval start, end;
@@ -335,10 +340,8 @@ int main(int argc, const char* argv[]){
     }
     gettimeofday(&end, 0);
 
-    long time = end.tv_usec - start.tv_usec;
-    printf("\n\n\nElapsed time %ldus for %d cycle\n", time, cycleCnt);
-    long mips = (cycleCnt / (time * 0.000001));
-    printf("Estimated MIPS: %d million par seconde", mips);
+    long execTime = end.tv_usec - start.tv_usec;
+    showMips(execTime);
 
     return 0;
 }
