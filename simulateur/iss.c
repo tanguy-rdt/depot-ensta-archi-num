@@ -362,6 +362,9 @@ void eval(Instr_t instr){
                     error(4, stderr);
                 }
             }
+            else if (instr.n == 3){
+                printf("%c", regs[1]);
+            }
     }
 
     regs[0] = 0;
