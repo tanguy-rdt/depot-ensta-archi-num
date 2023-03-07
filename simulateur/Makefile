@@ -19,6 +19,9 @@ CC       = g++
 CFLAGS   = -Wall -std=c++11
 CPPFLAGS = -I${MEMORY_DIR} -I${CACHE_DIR}
 
+ifdef VERBOSE
+    CFLAGS += -DVERBOSE
+endif
 
 all: ${EXEC}
 

@@ -397,10 +397,18 @@ int main(int argc, const char* argv[]){
     while(running){
         int instr = fetch();
         Instr_t instr_decode = decode(instr);
-        showInstr(instr_decode);
+
+        #ifdef VERBOSE
+            showInstr(instr_decode);
+        #endif
+    
         eval(instr_decode);
-        showRegs();
-        showCycle();
+
+        #ifdef VERBOSE
+            showRegs();
+            showCycle();
+        #endif
+   
     }
     gettimeofday(&end, 0);
 
