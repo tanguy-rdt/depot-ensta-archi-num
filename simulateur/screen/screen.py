@@ -79,7 +79,7 @@ def on_memory_modified(memory_path, mem, screen):
 def main():
     app = QApplication()
     
-    memory_path = os.path.join(os.getcwd(), "memory/.memory.bin")
+    memory_path = os.path.join(os.path.dirname(__file__), "../memory/.memory.bin")
     mem = Memory(memory_path)
     screen = Screen(mem)
     on_memory_modified(memory_path, mem, screen)

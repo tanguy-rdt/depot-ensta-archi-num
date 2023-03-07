@@ -1,4 +1,7 @@
-SRC_DIR  = .
+
+MAKEFILE_PATH=$(shell readlink -f .)
+
+SRC_DIR  = ${MAKEFILE_PATH}
 OBJ_DIR  = ${SRC_DIR}/obj
 MEMORY_DIR = ${SRC_DIR}/memory
 CACHE_DIR = ${SRC_DIR}/cache
