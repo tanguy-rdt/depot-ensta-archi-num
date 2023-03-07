@@ -262,7 +262,6 @@ void eval(Instr_t instr){
             cycleCnt += 1;
             break;
         case SUB:
-            printf("sub r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             overflow((long long)regs[instr.rAlpha] - o);
             regs[instr.rBeta] = regs[instr.rAlpha] - o;
             cycleCnt += 1;
