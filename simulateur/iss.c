@@ -162,6 +162,88 @@ void overflow(long val){
     }
 }
 
+
+void showInstr(Instr_t instr){
+    char* instrStrMask;
+
+    if (instr.imm){
+        if (instr.opcode == JMP)
+            instrStrMask = "%s r%d r%d";
+        else
+            instrStrMask = "%s r%d %d r%d";
+    }
+    else{
+        if (instr.opcode == BRAZ || instr.opcode == BRANZ || instr.opcode == JMP)
+            instrStrMask = "%s r%d %d";
+        else if (instr.opcode == SCALL)
+            instrStrMask = "%s %d";
+        else
+            instrStrMask = "%s r%d r%d r%d";
+    }
+
+    switch (instr.opcode){
+        case STOP:
+            printf("stop");
+            break;
+        case ADD:
+            fprintf(stdout, instrStrMask, "add", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case SUB:
+            fprintf(stdout, instrStrMask, "sub", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case MUL:
+            fprintf(stdout, instrStrMask, "mul", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case DIV:
+            fprintf(stdout, instrStrMask, "div", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case AND:
+            fprintf(stdout, instrStrMask, "and", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case OR:
+            fprintf(stdout, instrStrMask, "or", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case XOR:
+            fprintf(stdout, instrStrMask, "xor", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case SHL:
+            fprintf(stdout, instrStrMask, "shl", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case SHR:
+            fprintf(stdout, instrStrMask, "shr", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case SLT:
+            fprintf(stdout, instrStrMask, "slt", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case SLE:
+            fprintf(stdout, instrStrMask, "sle", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case SEQ:
+            fprintf(stdout, instrStrMask, "seq", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case LOAD:
+            fprintf(stdout, instrStrMask, "load", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case STORE:
+            fprintf(stdout, instrStrMask, "store", instr.rAlpha, instr.o, instr.rBeta);
+            break;
+        case JMP:
+            fprintf(stdout, instrStrMask, "jmp", instr.o, instr.r);
+            break;
+        case BRAZ:
+            fprintf(stdout, instrStrMask, "braz", instr.r, instr.a);
+            break;
+        case BRANZ:
+            fprintf(stdout, instrStrMask, "branz", instr.r, instr.a);
+            break;
+        case SCALL:
+            fprintf(stdout, instrStrMask, "scall", instr.n);
+    }
+
+    printf("%s\n", stdout);
+}
+
+
 void eval(Instr_t instr){
     int o;
     
@@ -173,10 +255,8 @@ void eval(Instr_t instr){
     switch (instr.opcode){
         case STOP:
             running = 0;
-            printf("stop\n");
             break;
         case ADD:
-            printf("add r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             overflow((long long)regs[instr.rAlpha] + o);
             regs[instr.rBeta] = regs[instr.rAlpha] + o;
             cycleCnt += 1;
@@ -188,43 +268,35 @@ void eval(Instr_t instr){
             cycleCnt += 1;
             break;
         case MUL:
-            printf("mul r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             overflow((long long)regs[instr.rAlpha] * o);
             regs[instr.rBeta] = regs[instr.rAlpha] * o;
             cycleCnt += 2;
             break;
         case DIV:
-            printf("div r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             regs[instr.rBeta] = regs[instr.rAlpha] / o;
             cycleCnt += 2;
             break;
         case AND:
-            printf("and r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             regs[instr.rBeta] = regs[instr.rAlpha] & o;
             cycleCnt += 1;
             break;
         case OR:
-            printf("or r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             regs[instr.rBeta] = (regs[instr.rAlpha] | o) + (regs[instr.rAlpha] & o);
             cycleCnt += 1;
             break;
         case XOR:
-            printf("xor r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             regs[instr.rBeta] = (regs[instr.rAlpha] ^ o) + (regs[instr.rAlpha] & o);
             cycleCnt += 1;
             break;
         case SHL:
-            printf("shl r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             regs[instr.rBeta] = regs[instr.rAlpha] << o;
             cycleCnt += 1;
             break;
         case SHR:
-            printf("shr r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             regs[instr.rBeta] = regs[instr.rAlpha] >> o;
             cycleCnt += 1;
             break;
         case SLT:
-            printf("slt r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             if (regs[instr.rAlpha] < o) 
                 regs[instr.rBeta] = 1;
             else 
@@ -232,7 +304,6 @@ void eval(Instr_t instr){
             cycleCnt += 1;
             break;
         case SLE:
-            printf("sle r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             if (regs[instr.rAlpha] <= o) 
                 regs[instr.rBeta] = 1;
             else 
@@ -240,7 +311,6 @@ void eval(Instr_t instr){
             cycleCnt += 1;
             break;
         case SEQ:
-            printf("seq r%d %d r%d\n", instr.rAlpha, instr.o, instr.rBeta);
             if (regs[instr.rAlpha] == o) 
                 regs[instr.rBeta] = 1;
             else 
@@ -248,7 +318,6 @@ void eval(Instr_t instr){
             cycleCnt += 1;
             break;
         case LOAD:
-            printf("load r%d %d r%d\n", instr.rAlpha, o, instr.rBeta);
             regs[instr.rBeta] = cache.read(regs[instr.rAlpha] + instr.o);
             if (cache.getCacheMiss())
                 cycleCnt += 100;
@@ -256,30 +325,25 @@ void eval(Instr_t instr){
                 cycleCnt += 2;
             break;
         case STORE:
-            printf("store r%d %d r%d\n", instr.rAlpha, o, instr.rBeta);
             cache.write(regs[instr.rAlpha] + instr.o, regs[instr.rBeta]);
             cycleCnt += 100;  
             break;
         case JMP:
-            printf("jmp %d r%d\n", o, instr.r);
             regs[instr.r] = instrNum;
             instrNum = o;
             cycleCnt += 1;
             break;
         case BRAZ:
-            printf("braz r%d, %d\n", instr.r, instr.a);
             if (regs[instr.r] == 0) 
                 instrNum = instr.a;
             cycleCnt += 1;
             break;
         case BRANZ:
-            printf("branz r%d, %d\n", instr.r, instr.a);
             if (regs[instr.r] != 0) 
                 instrNum = instr.a;
             cycleCnt += 1;
             break;
         case SCALL:
-            printf("scall %d\n", instr.n);
             if (instr.n == 0){
                 int val = 0;
                 printf("Data to set: ");
@@ -332,11 +396,12 @@ int main(int argc, const char* argv[]){
 
     gettimeofday(&start, 0);
     while(running){
-        showRegs();
-        showCycle();
         int instr = fetch();
         Instr_t instr_decode = decode(instr);
+        showInstr(instr_decode);
         eval(instr_decode);
+        showRegs();
+        showCycle();
     }
     gettimeofday(&end, 0);
 
