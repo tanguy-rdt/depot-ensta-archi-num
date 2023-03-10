@@ -305,7 +305,12 @@ void eval(Instr_t instr){
             else if (instr.n == 3){
                 printf("%c", regs[1]);
             }
-            else if (instr.n == 4){
+            else if (instr.n ==4){
+                char val = ' ';
+                scanf("%c", &val);
+                regs[1] = val;
+            }
+            else if (instr.n == 5){
                 srand(time(NULL));
                 regs[1] = rand() % regs[2];
             }
