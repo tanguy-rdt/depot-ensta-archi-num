@@ -18,16 +18,16 @@ Cache::~Cache()
 {
 }
 
-int Cache::write(int addr, int data){
+void Cache::write(int addr, int data){
     int indexLineHigherCacheMiss = _line[0].miss;
-    for (int i = 0; i < NB_BLOC; i++) {
+    for (int i = 0; i < NB_BLOC_CACHE; i++) {
         if (!_line[i].valid || _line[i].tag == addr){
             _line[i].data = data;
             _line[i].valid = 1;
             _line[i].tag = addr;
             _line[i].miss = 0;
             writeThrough(addr, data);
-            return _line[i].data;
+            break;
         }
         else if (_line[i].miss > indexLineHigherCacheMiss) {
             indexLineHigherCacheMiss = _line[i].miss;
@@ -39,11 +39,10 @@ int Cache::write(int addr, int data){
     _line[indexLineHigherCacheMiss].tag = addr;
     _line[indexLineHigherCacheMiss].miss = 0;
     writeThrough(addr, data);
-    return _line[indexLineHigherCacheMiss].data;
 }
 
 int Cache::read(int addr){
-    for (int i = 0; i < NB_BLOC; i++) {
+    for (int i = 0; i < NB_BLOC_CACHE; i++) {
         if (_line[i].valid && _line[i].tag == addr){
             return _line[i].data;
         }
@@ -52,7 +51,7 @@ int Cache::read(int addr){
     _cacheMiss = 1;
 
     int indexLineHigherCacheMiss = _line[0].miss;
-    for (int i = 0; i < NB_BLOC; i++) {
+    for (int i = 0; i < NB_BLOC_CACHE; i++) {
         if (!_line[i].valid){
             _line[i].data = _mem.read(addr);
             _line[i].valid = 1;
@@ -78,12 +77,12 @@ int Cache::getCacheMiss(){
     return lastCacheMiss;
 }
 
-int Cache::writeThrough(int addr, int data){
+void Cache::writeThrough(int addr, int data){
     _mem.write(addr, data);
 }
 
-int Cache::init(){
-    for (int i = 0; i < NB_BLOC; i++) {
+void Cache::init(){
+    for (int i = 0; i < NB_BLOC_CACHE; i++) {
         _line[i] = {};
     }
 }

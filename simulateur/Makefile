@@ -6,7 +6,7 @@ OBJ_DIR  = ${SRC_DIR}/obj
 MEMORY_DIR = ${SRC_DIR}/memory
 CACHE_DIR = ${SRC_DIR}/cache
 
-SRC_ISS    = ${SRC_DIR}/iss.c
+SRC_ISS    = ${SRC_DIR}/iss.cpp
 SRC_MEMORY = ${MEMORY_DIR}/memory.cpp
 SRC_CACHE  = ${CACHE_DIR}/cache.cpp
 

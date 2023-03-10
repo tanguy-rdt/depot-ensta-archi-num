@@ -11,12 +11,7 @@
 
 
 Memory::Memory(){
-    int ret = init();
-
-    if (!ret){
-        printf("Failed to init the memory");
-        exit(1);
-    }
+    init();
 }
 
 Memory::~Memory(){
@@ -24,7 +19,7 @@ Memory::~Memory(){
     //remove(strcat(dirname(realpath(__FILE__, NULL)), "/.memory.bin"));
 }
 
-int Memory::write(int addr, int data){
+void Memory::write(int addr, int data){
     char buf1[11] = "";
     char buf2[11] = "";
 
@@ -37,8 +32,6 @@ int Memory::write(int addr, int data){
         }
         fscanf(_memoryPtr, "%s %s\n", buf1, buf2);
     }
-
-    return 0;
 }
 
 int Memory::read(int addr){
@@ -53,9 +46,11 @@ int Memory::read(int addr){
             return (int)strtol(dataRead, NULL, 0);
         }
     }
+
+    return NULL;
 }
 
-int Memory::init(){
+void Memory::init(){
     char* filePath = strcat(dirname(realpath(__FILE__, NULL)), "/.memory.bin");
     _memoryPtr = fopen(filePath, "w+");
 

@@ -10,11 +10,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 #include <libgen.h>
 
-#define MEMORY_SIZE 1024 // en octet
-#define BLOCK_SIZE 4 // en octet soit int
+#define MEMORY_SIZE 1024
+#define BLOCK_SIZE 4 
 #define NB_BLOC MEMORY_SIZE/BLOCK_SIZE
 
 
@@ -25,11 +24,11 @@ class Memory
         Memory();
         ~Memory();
         
-        int write(int addr, int data);
+        void write(int addr, int data);
         int read(int addr);
 
     private: 
-        int init();
+        void init();
 
         FILE* _memoryPtr;
 };

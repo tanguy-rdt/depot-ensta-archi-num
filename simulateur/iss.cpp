@@ -9,13 +9,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
-#include <libgen.h>
 #include <unistd.h>
 #include <sys/time.h>
 
 #include "cache.h"
+
 
 #define STOP   0
 #define ADD    1
@@ -39,6 +38,7 @@
 
 #define NB_REGS 32
 
+
 Cache cache;
 
 int regs[NB_REGS];
@@ -60,12 +60,12 @@ typedef struct {
     int n;
 } Instr_t;
 
+
 void error(int errorCode, FILE* msg){
     printf("%s\n", msg);
     printf("Exit code: %d\n", errorCode);
     exit(errorCode);
 }
-
 
 FILE* openFile(char *pathFile){
     FILE* ptr;
@@ -82,8 +82,7 @@ FILE* openFile(char *pathFile){
     return NULL;
 }
 
-
-char** parseFile(FILE* ptr){
+void parseFile(FILE* ptr){
     char addr[11] = "";
     char instr[11] = "";
 
@@ -95,73 +94,46 @@ char** parseFile(FILE* ptr){
         i++;
     }
     fclose(ptr);
-
-    return instrs;
 }
-
-
-
-void showCycle(){
-    printf("Cycle number = %d\n\n", cycleCnt);
-}
-
-
-void showRegs(){
-    printf("regs = ");
-    for (int i = 0; i < NB_REGS; i++){
-        printf("%08x ", regs[i]);
-    }
-    printf("\n");
-}
-
 
 int fetch(){
     char* instr = instrs[instrNum++];
     return (int)strtol(instr, NULL, 0);
 }
 
-
 Instr_t decode(int instr){
-    Instr_t my_instr;
+    Instr_t instrStruct;
     int opcode = (instr >> 27) & 0x0000001f;
-    my_instr.opcode = opcode;
+    instrStruct.opcode = opcode;
 
     switch(opcode){
         case STOP:
             break;
         case JMP:
-            my_instr.imm     = (instr >> 26) & 0x00000001;
-            my_instr.o       = (instr >> 5)  & 0x0000ffff;
-            my_instr.r       = (instr)       & 0x0000001f;
+            instrStruct.imm     = (instr >> 26) & 0x00000001;
+            instrStruct.o       = (instr >> 5)  & 0x0000ffff;
+            instrStruct.r       = (instr)       & 0x0000001f;
             break;
         case BRAZ:
-            my_instr.r       = (instr >> 22) & 0x0000001f;
-            my_instr.a       = (instr)       & 0x001fffff;
+            instrStruct.r       = (instr >> 22) & 0x0000001f;
+            instrStruct.a       = (instr)       & 0x001fffff;
             break;
         case BRANZ: 
-            my_instr.r       = (instr >> 22) & 0x0000001f;
-            my_instr.a       = (instr)       & 0x001fffff;
+            instrStruct.r       = (instr >> 22) & 0x0000001f;
+            instrStruct.a       = (instr)       & 0x001fffff;
             break;
         case SCALL:
-            my_instr.n       = (instr)       & 0x001fffff;
+            instrStruct.n       = (instr)       & 0x001fffff;
             break;
         default:
-            my_instr.rAlpha  = (instr >> 22) & 0x0000001f;
-            my_instr.imm     = (instr >> 21) & 0x00000001;
-            my_instr.o       = (int16_t)((instr >> 5)  & 0x0000ffff);
-            my_instr.rBeta   = (instr)       & 0x0000001f;
+            instrStruct.rAlpha  = (instr >> 22) & 0x0000001f;
+            instrStruct.imm     = (instr >> 21) & 0x00000001;
+            instrStruct.o       = (int16_t)((instr >> 5)  & 0x0000ffff);
+            instrStruct.rBeta   = (instr)       & 0x0000001f;
             break;
     }
-    return my_instr;
+    return instrStruct;
 }
-
-void overflow(long val){
-     if ((val > (signed)0x7fffffff) || (val < (signed)0x80000000)){
-        fprintf(stderr, "ERROR: overflow");
-        error(3, stderr);
-    }
-}
-
 
 void showInstr(Instr_t instr){
     char* instrStrMask;
@@ -206,6 +178,12 @@ void showInstr(Instr_t instr){
     printf("%s\n", stdout);
 }
 
+void overflow(long val){
+     if ((val > (signed)0x7fffffff) || (val < (signed)0x80000000)){
+        fprintf(stderr, "ERROR: overflow");
+        error(3, stderr);
+    }
+}
 
 void eval(Instr_t instr){
     int o;
@@ -336,9 +314,21 @@ void eval(Instr_t instr){
     regs[0] = 0;
 }
 
+void showCycle(){
+    printf("Cycle number = %d\n\n", cycleCnt);
+}
+
+void showRegs(){
+    printf("regs = ");
+    for (int i = 0; i < NB_REGS; i++){
+        printf("%08x ", regs[i]);
+    }
+    printf("\n");
+}
+
 void showMips(long execTime){
-    printf("\n\n\nElapsed time %ldus for %d cycle\n", execTime, cycleCnt);
     long mips = (cycleCnt / (execTime * 0.000001));
+    printf("\n\nElapsed time %ldus for %d cycle\n", execTime, cycleCnt);
     printf("Estimated MIPS: %d million par seconde", mips);
 }
 
@@ -360,7 +350,7 @@ int main(int argc, const char* argv[]){
     }
 
     ptrFile = openFile(filePath);
-    instrs = parseFile(ptrFile);
+    parseFile(ptrFile);
 
     gettimeofday(&start, 0);
     while(running){

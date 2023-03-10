@@ -12,9 +12,9 @@
 
 #include "memory.h"
 
-#define CACHE_SIZE 104 // en octet
-#define BLOCK_SIZE 4 // en octet soit int
-#define NB_BLOC CACHE_SIZE/BLOCK_SIZE
+#define CACHE_SIZE 104 
+#define BLOCK_SIZE 4
+#define NB_BLOC_CACHE CACHE_SIZE/BLOCK_SIZE
 
 class Cache
 {
@@ -22,13 +22,13 @@ class Cache
         Cache();
         ~Cache();
 
-        int write(int addr, int data);
+        void write(int addr, int data);
         int read(int addr);
         int getCacheMiss();
 
     private: 
-        int writeThrough(int addr, int data);
-        int init();
+        void writeThrough(int addr, int data);
+        void init();
 
         Memory _mem;
 
@@ -39,7 +39,7 @@ class Cache
             int miss;
         } _cacheLines_t;
 
-        _cacheLines_t _line[NB_BLOC];
+        _cacheLines_t _line[NB_BLOC_CACHE];
 
         int _cacheMiss = 0;
 };
