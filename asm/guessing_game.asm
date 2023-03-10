@@ -1,6 +1,6 @@
     jmp guessing_game, r20
     add r0, 50, r2
-    scall 4
+    scall 5
     add r1, 0, r2
 
 in_game:
