@@ -13,68 +13,68 @@ in_game:
 
 guessing_game: 
     add r0, 71, r1
-    scall 3
+    scall 4
     add r0, 117, r1
-    scall 3
+    scall 4
     add r0, 101, r1
-    scall 3
+    scall 4
     add r0, 115, r1
-    scall 3
+    scall 4
     add r0, 115, r1
-    scall 3
+    scall 4
     add r0, 105, r1
-    scall 3
+    scall 4
     add r0, 110, r1
-    scall 3
+    scall 4
     add r0, 103, r1
-    scall 3
+    scall 4
     add r0, 32, r1
-    scall 3
+    scall 4
     add r0, 103, r1
-    scall 3
+    scall 4
     add r0, 97, r1
-    scall 3
+    scall 4
     add r0, 109, r1
-    scall 3
+    scall 4
     add r0, 101, r1
-    scall 3
+    scall 4
     add r0, 32, r1
-    scall 3
+    scall 4
     add r0, 33, r1
-    scall 3
+    scall 4
     add r0, 10, r1
-    scall 3
+    scall 4
     add r0, 10, r1
-    scall 3
+    scall 4
     add r0, 10, r1
-    scall 3
+    scall 4
     jmp r20, r0
 
 give_value:
     add r0, 71, r1
-    scall 3
+    scall 4
     add r0, 105, r1
-    scall 3
+    scall 4
     add r0, 118, r1
-    scall 3
+    scall 4
     add r0, 101, r1
-    scall 3
+    scall 4
     add r0, 32, r1
-    scall 3
+    scall 4
     add r0, 118, r1
-    scall 3
+    scall 4
     add r0, 97, r1
-    scall 3
+    scall 4
     add r0, 108, r1
-    scall 3
+    scall 4
     add r0, 117, r1
-    scall 3
+    scall 4
     add r0, 101, r1
-    scall 3
+    scall 4
     add r0, 58, r1
-    scall 3
+    scall 4
     add r0, 32, r1
-    scall 3
+    scall 4
     scall 0
     jmp r20, r0
 
@@ -98,48 +98,48 @@ is_sup:
 
 clue:
     add r0, 73, r1
-    scall 3
+    scall 4
     add r0, 116, r1
-    scall 3
+    scall 4
     add r0, 39, r1
-    scall 3
+    scall 4
     add r0, 115, r1
-    scall 3
+    scall 4
     add r0, 58, r1
-    scall 3
+    scall 4
     add r0, 32, r1
-    scall 3
+    scall 4
     branz r3, is_equal
     branz r4, is_sup
     braz r5, is_inf
 
 print_clue:
-    scall 3
+    scall 4
     add r0, 10, r1
-    scall 3
+    scall 4
     add r0, 10, r1
-    scall 3
+    scall 4
     jmp r21, r0
 
 win:
     add r0, 89, r1
-    scall 3
+    scall 4
     add r0, 111, r1
-    scall 3
+    scall 4
     add r0, 117, r1
-    scall 3
+    scall 4
     add r0, 32, r1
-    scall 3
+    scall 4
     add r0, 119, r1
-    scall 3
+    scall 4
     add r0, 105, r1
-    scall 3
+    scall 4
     add r0, 110, r1
-    scall 3
+    scall 4
     add r0, 32, r1
-    scall 3
+    scall 4
     add r0, 33, r1
-    scall 3
+    scall 4
     add r0, 10, r1
-    scall 3
+    scall 4
     jmp r20, r0
