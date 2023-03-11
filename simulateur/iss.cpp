@@ -225,7 +225,7 @@ void eval(Instr_t instr){
             cycleCnt += 1;
             break;
         case XOR:
-            regs[instr.rBeta] = (regs[instr.rAlpha] ^ o) + (regs[instr.rAlpha] & o);
+            regs[instr.rBeta] = (regs[instr.rAlpha] ^ o);
             cycleCnt += 1;
             break;
         case SHL:
@@ -303,12 +303,10 @@ void eval(Instr_t instr){
                 }
             }
             else if (instr.n == 3){
-                printf("%c", regs[1]);
+                regs[1] = getchar();
             }
-            else if (instr.n ==4){
-                char val = ' ';
-                scanf("%c", &val);
-                regs[1] = val;
+            else if (instr.n == 4){
+                printf("%c", regs[1]);
             }
             else if (instr.n == 5){
                 srand(time(NULL));
