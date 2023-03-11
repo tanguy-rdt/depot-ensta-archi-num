@@ -1,15 +1,21 @@
 # Assembleur
 
+- [Assembleur](#assembleur)
+  - [Utilisation](#utilisation)
+  - [Options](#options)
+  - [Syntaxe asm](#syntaxe-asm)
+  - [Gestion des Erreurs](#gestion-des-erreurs)
+
 ## Utilisation 
 
 - Depuis la racine du projet __sans__ `set-env`
    ```bash
-   $ python3 assembleur/assembleur -i asm/data.asm -o bin/data.bin
+   $ python3 assembleur/assembleur -i asm/guessing_game.asm -o bin/guessing_game.bin
    ```
 
 - Depuis la racine du projet __avec__ `set-env`
    ```bash
-   $ assembleur -i asm/data.asm -o bin/data.bin
+   $ assembleur -i asm/guessing_game.asm -o bin/guessing_game.bin
    ```
 
 
@@ -36,8 +42,8 @@ Options:
    Permet de diriger la sortie standart du programme vers le fichier _assembleur.log_ \
    __Exemple:__
    ```
-   $ python assembleur.py -i ../asm/data.asm -o ../bin/data.bin -l  
-   $ tail -n 2 assembleur.log
+   $ assembleur -i asm/guessing_game.asm -o bin/guessing_game.bin -l  
+   $ tail -n 2 assembleur/assembleur.log
    2023-02-26, 22:27:23 -- INFO -- End of assembly to binary translation
    2023-02-26, 22:27:23 -- INFO -- Exit code: 0
    ```
@@ -46,10 +52,10 @@ Options:
    Permet d'obtenir plus d'information pendant l'execution du programme si des problèmes surviennent. \
    __Exemple:__
    ```
-   $ python assembleur.py -i ../asm/data.asm -o ../bin/data.bin -d
-   2023-02-26, 22:25:26 -- INFO -- Opening the asm file: /Users/tanguyrdt/Documents/ENSTA_depot/depot-ensta-archi-num/asm/data.asm
+   $ assembleur -i asm/guessing_game.asm -o bin/guessing_game.bin -d
+   2023-02-26, 22:25:26 -- INFO -- Opening the asm file: /home/me/depot-ensta-archi-num/asm/guessing_game.asm
    2023-02-26, 22:25:26 -- INFO -- Parsing of the asm file
-   2023-02-26, 22:25:26 -- INFO -- Creation of the binary file: /Users/tanguyrdt/Documents/ENSTA_depot/depot-ensta-archi-num/bin/data.bin
+   2023-02-26, 22:25:26 -- INFO -- Creation of the binary file: /home/me/depot-ensta-archi-num/bin/guessing_game.bin
    2023-02-26, 22:25:26 -- INFO -- Start of assembly to binary translation
    2023-02-26, 22:25:26 -- DEBUG -- Conversion from str to hex of the instruction number 0: add r0 2 r1
    2023-02-26, 22:25:26 -- DEBUG -- Result of the conversion: 0x08200041
