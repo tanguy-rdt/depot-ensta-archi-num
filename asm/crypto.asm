@@ -1,3 +1,8 @@
+; Pour réaliser cette asm on ses inspiré de l'un des moyen pour chifffré une chaine de carcactère: le xor.
+; Malheureseument nous n'avons pas réussi à prendre une chaine de caractère sans appuyer sur entré pour valider chaque char
+; alors nous l'avons fait pour des entiers
+   
+   
     jmp give_nbr, r20
     jmp give_secret_nbr, r20
     xor r10, r11, r12

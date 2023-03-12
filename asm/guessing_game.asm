@@ -1,14 +1,15 @@
     jmp guessing_game, r20
-    add r0, 50, r2
+    add r0, 50, r30 ; max rand value
+    add r0, r30, r2
     scall 5
-    add r1, 0, r2
+    add r1, 0, r2 ; rand value
 
 in_game:
-    jmp give_value, r20
-    jmp test_value, r20
-    jmp clue, r21
-    braz r3, in_game
-    jmp win, r20
+    jmp give_value, r20 ; demande de donner une valeur
+    jmp test_value, r20 ; test la valeur
+    jmp clue, r21 ; donne un indice
+    braz r3, in_game ; tant qu'on a pas trouvé on continue
+    jmp win, r20 ; c'est gagné
     stop
 
 guessing_game: 
@@ -71,6 +72,30 @@ give_value:
     scall 4
     add r0, 101, r1
     scall 4
+    add r0, 32, r1
+    scall 4
+    add r0, 98, r1
+    scall 4
+    add r0, 101, r1
+    scall 4
+    add r0, 116, r1
+    scall 4
+    add r0, 119, r1
+    scall 4
+    add r0, 101, r1
+    scall 4
+    add r0, 101, r1
+    scall 4
+    add r0, 110, r1
+    scall 4
+    add r0, 32, r1
+    scall 4
+    add r0, 0, r1
+    scall 1
+    add r0, 45, r1
+    scall 4
+    add r0, r30, r1
+    scall 1
     add r0, 58, r1
     scall 4
     add r0, 32, r1
@@ -109,9 +134,9 @@ clue:
     scall 4
     add r0, 32, r1
     scall 4
-    branz r3, is_equal
-    branz r4, is_sup
-    braz r5, is_inf
+    branz r3, is_equal ; si c'est égale alors on affiche égale
+    branz r4, is_sup ; sinon un +
+    braz r5, is_inf ; sinon un -
 
 print_clue:
     scall 4
