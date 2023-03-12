@@ -3,9 +3,9 @@
     ; initialisation de la mem
     add r0, 3, r2 ; multiplicateur de pixels (pour voir plus gros)
     shl r2, 12, r2 ; décalage de la position du facteur pour respecter 0x0fxxxyyy
-    add r2, 255, r2 ; résolution en pixels sur les x (largeur)
+    add r2, 70, r2 ; résolution en pixels sur les x (largeur)
     shl r2, 12, r2
-    add r2, 255, r2 ; résolution en pixels sur les y (hauteur)
+    add r2, 70, r2 ; résolution en pixels sur les y (hauteur)
     store r1, 0, r2 ; registre init dans la mem à addr 0 (registre utilisé par l'écran)
     add r1, 1, r1 ; on incrémente le compteur de mem
 

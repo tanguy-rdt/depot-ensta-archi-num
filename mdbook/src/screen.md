@@ -10,6 +10,12 @@ $ pip install pyside6
 ## screen.py
 Cette écran à était conçus principalement pour réaliser des dessins ou des graphiques, il n'est pas réellement adapter pour afficher une image monochrome.
 
+_Exemple avec `square.asm`:_
+
+<p align="center">
+  <img src="./.img/screen.png" alt="square.asm">
+</p>
+
 
 
 #### Initialisation 
@@ -17,7 +23,9 @@ La première ligne de la mémoire, adresse `0x00000000`, permet d'initialiser l'
 
 Registre d'initialisation :
 
-![](./.img/screen_reg_init.png)
+<p align="center">
+  <img src="./.img/screen_reg_init.png" alt="screen_reg_init">
+</p>
 
 - `f` : Facteur de taille, permet d'agrandir la taille d'un pixel
 - `x` : Nombre de pixels en largeur
@@ -29,7 +37,9 @@ C'est un écran monochrome, au moment de l'initalisation tout les pixels sont co
 
 Registre d'affichage :
 
-![](./.img/screen_reg_aff.png)
+<p align="center">
+  <img src="./.img/screen_reg_aff.png" alt="screen_reg_aff">
+</p>
 
 - `x` : Position x du pixel à mettre en noir
 - `y` : Position y du pixel à mettre en noir
@@ -47,12 +57,19 @@ Cette écran fonctionne, quand on on réalise une modification de la mémoire à
 Contrairement avec l'ISS, ce problème vient de notre méthode de lecture et d'écriture dans la mémoire. Dans notre fichier `memory.cpp`, on ouvre une seul fois la mémoire, quand on écris dedans les modifications sont bien réalisé. Mais comme on ne le ferme jamais 
 les modifications ne sont pas enregistrer, elle reste dans le buffer, alors l'écran ne peut pas détecter une modification. Il aurait fallu modifier notre méthode ; ouvrir et fermer la mémoire à chaque modification, mais par manque de temps nous n'avons pas pus réaliser c'est modifications.
 
+<p align="center">
+  <img src="./.img/screen_v0_1.png" alt="screenV0" width="350" height="350" >
+  <img src="./.img/screen_v0_2.png" alt="screenV0" width="350" height="350">
+</p>
+
 #### Initialisation 
 La première ligne de la mémoire, adresse `0x00000000`, permet d'initialiser l'écran.
 
 Registre d'initialisation :
 
-![](./.img/screen_v0_reg_init.png)
+<p align="center">
+  <img src="./.img/screen_v0_reg_init.png" alt="screen_v0_reg_init">
+</p>
 
 - `g` : Affichage d'une grille
 - `f` : Facteur de taille, permet d'agrandir la taille d'un pixel
@@ -65,7 +82,9 @@ C'est un écran monochrome, au moment de l'initalisation tout les pixels sont co
 
 Registre d'affichage :
 
-![](./.img/screen_v0_reg_aff.png)
+<p align="center">
+  <img src="./.img/screen_v0_reg_aff.png" alt="screen_v0_reg_aff">
+</p>
 
 - `x` : Position x du pixel à mettre en couleur
 - `y` : Position y du pixel à mettre en couleur
