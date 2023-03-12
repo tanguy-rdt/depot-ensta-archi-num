@@ -1,3 +1,5 @@
+       ; il faut compiler avec le mode verbose make VERBOSE=1
+       
         add r0, 32767, r1
         mul r1, 32767, r2
         mul r2, 2, r3
