@@ -43,11 +43,11 @@ Cache cache;
 
 int regs[NB_REGS];
 
-char **instrs = NULL;
+int* instrs;
 int instrNum = 0;
-int instrCnt = 0;
+long instrCnt = 0;
 
-int cycleCnt = 0;
+long cycleCnt = 0;
 int running = 1;
 
 typedef struct {
@@ -89,26 +89,23 @@ void parseFile(FILE* ptr){
 
     int i = 0;
     while (fscanf(ptr, "%s %s", addr, instr) != EOF) {
-        instrs = (char**)realloc(instrs, sizeof(instrs) * (i+1));
-        instrs[i] = (char*)malloc(strlen(instr));
-        strcpy(instrs[i], instr);
+        instrs = (int*)realloc(instrs, sizeof(instrs));
+        instrs[i] = (int)strtol(instr, NULL, 0);
         i++;
     }
     fclose(ptr);
 }
 
 int fetch(){
-    char* instr = instrs[instrNum++];
     instrCnt++;
-    return (int)strtol(instr, NULL, 0);
+    return instrs[instrNum++];
 }
 
 Instr_t decode(int instr){
     Instr_t instrStruct;
-    int opcode = (instr >> 27) & 0x0000001f;
-    instrStruct.opcode = opcode;
+    instrStruct.opcode = (instr >> 27) & 0x0000001f;
 
-    switch(opcode){
+    switch(instrStruct.opcode){
         case STOP:
             break;
         case JMP:
@@ -200,17 +197,17 @@ void eval(Instr_t instr){
             running = 0;
             break;
         case ADD:
-            overflow((long long)regs[instr.rAlpha] + o);
+            //overflow((long long)regs[instr.rAlpha] + o);
             regs[instr.rBeta] = regs[instr.rAlpha] + o;
-            cycleCnt += 1;
+            cycleCnt++;
             break;
         case SUB:
-            overflow((long long)regs[instr.rAlpha] - o);
+            //overflow((long long)regs[instr.rAlpha] - o);
             regs[instr.rBeta] = regs[instr.rAlpha] - o;
-            cycleCnt += 1;
+            cycleCnt++;
             break;
         case MUL:
-            overflow((long long)regs[instr.rAlpha] * o);
+            //overflow((long long)regs[instr.rAlpha] * o);
             regs[instr.rBeta] = regs[instr.rAlpha] * o;
             cycleCnt += 2;
             break;
@@ -220,44 +217,44 @@ void eval(Instr_t instr){
             break;
         case AND:
             regs[instr.rBeta] = regs[instr.rAlpha] & o;
-            cycleCnt += 1;
+            cycleCnt++;
             break;
         case OR:
             regs[instr.rBeta] = (regs[instr.rAlpha] | o) + (regs[instr.rAlpha] & o);
-            cycleCnt += 1;
+            cycleCnt++;
             break;
         case XOR:
             regs[instr.rBeta] = (regs[instr.rAlpha] ^ o);
-            cycleCnt += 1;
+            cycleCnt++;
             break;
         case SHL:
             regs[instr.rBeta] = regs[instr.rAlpha] << o;
-            cycleCnt += 1;
+            cycleCnt++;
             break;
         case SHR:
             regs[instr.rBeta] = regs[instr.rAlpha] >> o;
-            cycleCnt += 1;
+            cycleCnt++;
             break;
         case SLT:
             if (regs[instr.rAlpha] < o) 
                 regs[instr.rBeta] = 1;
             else 
                 regs[instr.rBeta] = 0;
-            cycleCnt += 1;
+            cycleCnt++;
             break;
         case SLE:
             if (regs[instr.rAlpha] <= o) 
                 regs[instr.rBeta] = 1;
             else 
                 regs[instr.rBeta] = 0;
-            cycleCnt += 1;
+            cycleCnt++;
             break;
         case SEQ:
             if (regs[instr.rAlpha] == o) 
                 regs[instr.rBeta] = 1;
             else 
                 regs[instr.rBeta] = 0;
-            cycleCnt += 1;
+            cycleCnt++;
             break;
         case LOAD:
             regs[instr.rBeta] = cache.read(regs[instr.rAlpha] + instr.o);
@@ -320,7 +317,7 @@ void eval(Instr_t instr){
 }
 
 void showCycle(){
-    printf("Cycle number = %d\n\n", cycleCnt);
+    printf("Cycle number = %ld\n\n", cycleCnt);
 }
 
 void showRegs(){
@@ -333,7 +330,7 @@ void showRegs(){
 
 void showMips(double execTime){
     long mips = (instrCnt / (execTime))/1000000;
-    printf("\n\nElapsed time %fs for %d in %d cycle\n", execTime, instrCnt, cycleCnt);
+    printf("\n\nElapsed time %fs for %ld in %ld cycle\n", execTime, instrCnt, cycleCnt);
     printf("Estimated MIPS: %ld million par seconde", mips);
 }
 
