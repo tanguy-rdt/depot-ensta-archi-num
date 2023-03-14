@@ -27,8 +27,8 @@ Usage:
    ```
 
 
-Il est nécessaire de spécifier le chemin du fichier binaire. Sans cette information le programme ne pourra pas s'executer. \
-Le programme ne prend pas d'autres arguments, si plus d'un est donné alors le programme générera une erreur.
+Il est nécessaire de spécifier le chemin du fichier binaire. Sans cette information le programme ne pourra pas s'exécuter. \
+Le programme ne prends pas d'autres arguments, si plus d'un argument est donné alors le programme générera une erreur.
 
 ## Fonctionnalités
 
@@ -61,7 +61,7 @@ Le programme ne prend pas d'autres arguments, si plus d'un est donné alors le p
 ## Option 
 
 1. __`VERBOSE=1`__:\
-   Permet d'utiliser l'iss en mode verbose. Si cette option est utilisé alors l'instruction réalisé et l'état des registre seront affiché à chaque cycle. \
+   Permet d'utiliser l'iss en mode verbose. Si cette option est utilisé alors l'instruction réalisée et l'état des registres seront affichés à chaque cycle. \
    Cette option ne s'utilise pas avec l'éxecutable, elle doit être donné au moment de la compilation: `make VERBOSE=1`
 
    __Exemple:__
@@ -89,7 +89,7 @@ Le programme ne prend pas d'autres arguments, si plus d'un est donné alors le p
 
 Code de sortie | Information 
 ---------------|------------
-0              | Programme executer avec succés
+0              | Programme executer avec succès
 1              | Fichier binaire non précisé
 2              | Erreur lors de l'ouverture du fichier binaire
 3              | Dépassement du registre _(overflow)_
