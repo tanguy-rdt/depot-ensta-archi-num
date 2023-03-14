@@ -19,7 +19,7 @@
    ```
 
 
-Il est nécessaire de spécifier le chemin du fichier asm avec l'option `-i` et le chemin du fichier binaire avec `-o`. Sans ces informations le programme ne pourra pas s'executer.
+Il est nécessaire de spécifier le chemin du fichier asm avec l'option `-i` et le chemin du fichier binaire avec `-o`. Sans ces informations le programme ne pourra pas s'exécuter.
 
 
 ## Options 
@@ -39,7 +39,7 @@ Options:
 ```
 
 1. __`-l --log`__:\
-   Permet de diriger la sortie standart du programme vers le fichier _assembleur.log_ \
+   Permet de diriger la sortie standard du programme vers le fichier _assembleur.log_ \
    __Exemple:__
    ```
    $ assembleur -i asm/guessing_game.asm -o bin/guessing_game.bin -l  
@@ -49,7 +49,7 @@ Options:
    ```
 
 2. __`-d --debug`__:\
-   Permet d'obtenir plus d'information pendant l'execution du programme si des problèmes surviennent. \
+   Permet d'obtenir plus d'information pendant l'exécution du programme si des problèmes surviennent. \
    __Exemple:__
    ```
    $ assembleur -i asm/guessing_game.asm -o bin/guessing_game.bin -d
@@ -68,18 +68,18 @@ Options:
 
 ## Syntaxe asm
 1. __Commentaire__:
-   - Les commentaires sont identifiés avec le caractère `;`, tous textes qui suit ce caractèrre sera ignoré. 
-   - Le commentaire peut être collé ou espacer du caractère `;`.
+   - Les commentaires sont identifiés avec le caractère `;`, tout texte qui suit ce caractère sera ignoré. 
+   - Le commentaire peut être collé ou espacé du caractère `;`.
    - Ils peuvent être placé à n'importe quel endroit.
   
 2. __Label__:
    - Les labels doivent contenir au moins un caractère suivit de `:`, sans espace.
-   - Les labels doivent obligatoirements être précedé d'un retour à la ligne, il est important que ce soit le premier élément de la ligne.
-   - Les labels peuvent être suivit d'un commentaire, d'une instruction, d'espaces ou d'un retour à la ligne
+   - Les labels doivent obligatoirement être précedé d'un retour à la ligne, il est important que ce soit le premier élément de la ligne.
+   - Les labels peuvent être suivit d'un commentaire, d'une instruction, d'espaces ou d'un retour à la ligne.
   
 3. __Instruction__:
-   - Les instructions peuvent être précédé par un label
-   - Les instructions doivent obligatoirement être précédé d'une tabulation si la ligne contient uniquement l'instruction et optionellement un commentaire
+   - Les instructions peuvent être précédé par un label.
+   - Les instructions doivent obligatoirement être précédé d'une tabulation si la ligne contient uniquement l'instruction et optionellement un commentaire.
 
 __Exemple:__
    ```asm
@@ -98,8 +98,8 @@ __Exemple:__
 
 Code de sortie | Information 
 ---------------|------------
-0              | Programme executer avec succés
-1              | Option -i et/ou -o non précisées
+0              | Programme exécuter avec succès
+1              | Option -i et/ou -o non précisé
 2              | Erreur lors de l'ouverture du fichier asm
 3              | Erreur lors de la création du fichier binaire
 4              | Erreur lors de la convertion de l'instruction en hexadécimal
