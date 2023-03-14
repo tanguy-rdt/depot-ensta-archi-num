@@ -45,6 +45,7 @@ int regs[NB_REGS];
 
 char **instrs = NULL;
 int instrNum = 0;
+int instrCnt = 0;
 
 int cycleCnt = 0;
 int running = 1;
@@ -98,6 +99,7 @@ void parseFile(FILE* ptr){
 
 int fetch(){
     char* instr = instrs[instrNum++];
+    instrCnt++;
     return (int)strtol(instr, NULL, 0);
 }
 
@@ -271,17 +273,17 @@ void eval(Instr_t instr){
         case JMP:
             regs[instr.r] = instrNum;
             instrNum = o;
-            cycleCnt += 1;
+            cycleCnt += 2;
             break;
         case BRAZ:
             if (regs[instr.r] == 0) 
                 instrNum = instr.a;
-            cycleCnt += 1;
+            cycleCnt += 2;
             break;
         case BRANZ:
             if (regs[instr.r] != 0) 
                 instrNum = instr.a;
-            cycleCnt += 1;
+            cycleCnt += 2;
             break;
         case SCALL:
             if (instr.n == 0){
@@ -329,15 +331,15 @@ void showRegs(){
     printf("\n");
 }
 
-void showMips(long execTime){
-    long mips = (cycleCnt / (execTime * 0.000001));
-    printf("\n\nElapsed time %ldus for %d cycle\n", execTime, cycleCnt);
-    printf("Estimated MIPS: %d million par seconde", mips);
+void showMips(double execTime){
+    long mips = (instrCnt / (execTime))/1000000;
+    printf("\n\nElapsed time %fs for %d in %d cycle\n", execTime, instrCnt, cycleCnt);
+    printf("Estimated MIPS: %ld million par seconde", mips);
 }
 
 
 int main(int argc, const char* argv[]){
-    struct timeval start, end;
+    clock_t start, end;
 
     FILE* ptrFile = NULL;
     char* filePath = NULL;
@@ -355,7 +357,7 @@ int main(int argc, const char* argv[]){
     ptrFile = openFile(filePath);
     parseFile(ptrFile);
 
-    gettimeofday(&start, 0);
+    start = clock();
     while(running){
         int instr = fetch();
         Instr_t instr_decode = decode(instr);
@@ -372,9 +374,9 @@ int main(int argc, const char* argv[]){
         #endif
    
     }
-    gettimeofday(&end, 0);
+    end = clock();
 
-    long execTime = end.tv_usec - start.tv_usec;
+    double execTime = (double)(end-start)/CLOCKS_PER_SEC;
     showMips(execTime);
 
     return 0;
