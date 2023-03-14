@@ -68,18 +68,18 @@ Options:
 
 ## Syntaxe asm
 1. __Commentaire__:
-   - Les commentaires sont identifiés avec le caractère `;`, tout texte qui suit ce caractère sera ignoré. 
-   - Le commentaire peut être collé ou espacé du caractère `;`.
-   - Ils peuvent être placé à n'importe quel endroit.
+   - Les commentaires sont identifiés avec le caractère `;`, tout texte qui suit ce caractère sera ignoré 
+   - Le commentaire peut être collé ou espacé du caractère `;`
+   - Ils peuvent être placé à n'importe quel endroit
   
 2. __Label__:
-   - Les labels doivent contenir au moins un caractère suivit de `:`, sans espace.
-   - Les labels doivent obligatoirement être précedé d'un retour à la ligne, il est important que ce soit le premier élément de la ligne.
-   - Les labels peuvent être suivit d'un commentaire, d'une instruction, d'espaces ou d'un retour à la ligne.
+   - Les labels doivent contenir au moins un caractère suivit de `:`, sans espace
+   - Les labels doivent obligatoirement être précedé d'un retour à la ligne, il est important que ce soit le premier élément de la ligne
+   - Les labels peuvent être suivit d'un commentaire, d'une instruction, d'espaces ou d'un retour à la ligne
   
 3. __Instruction__:
-   - Les instructions peuvent être précédé par un label.
-   - Les instructions doivent obligatoirement être précédé d'une tabulation si la ligne contient uniquement l'instruction et optionellement un commentaire.
+   - Les instructions peuvent être précédé par un label
+   - Les instructions doivent obligatoirement être précédé d'une tabulation si la ligne contient uniquement l'instruction et optionellement un commentaire
 
 __Exemple:__
    ```asm
