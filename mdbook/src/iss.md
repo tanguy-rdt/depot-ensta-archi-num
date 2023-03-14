@@ -41,7 +41,7 @@ Le programme ne prends pas d'autres arguments, si plus d'un argument est donné 
 3. __Tests sur des valeurs:__
    slt, sle, seq
 
-4. __Brachement:__
+4. __Branchement:__
    jmp, braz, branz
 
 5. __Mémoire:__
