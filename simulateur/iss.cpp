@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h>
-#include <sys/time.h>
+#include <time.h>
 
 #include "cache.h"
 
@@ -197,17 +197,17 @@ void eval(Instr_t instr){
             running = 0;
             break;
         case ADD:
-            //overflow((long long)regs[instr.rAlpha] + o);
+            overflow((long long)regs[instr.rAlpha] + o);
             regs[instr.rBeta] = regs[instr.rAlpha] + o;
             cycleCnt++;
             break;
         case SUB:
-            //overflow((long long)regs[instr.rAlpha] - o);
+            overflow((long long)regs[instr.rAlpha] - o);
             regs[instr.rBeta] = regs[instr.rAlpha] - o;
             cycleCnt++;
             break;
         case MUL:
-            //overflow((long long)regs[instr.rAlpha] * o);
+            overflow((long long)regs[instr.rAlpha] * o);
             regs[instr.rBeta] = regs[instr.rAlpha] * o;
             cycleCnt += 2;
             break;
