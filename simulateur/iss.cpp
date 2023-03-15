@@ -299,9 +299,11 @@ void eval(){
                 int val = 0;
                 scanf("%d", &val);
                 cpu.regs[1] = val;
+                cpu.cycleCnt += 2;
             }
             else if (instrDecode.n == 1){
                 printf("%d", cpu.regs[1]);
+                cpu.cycleCnt += 2;
             }
             else if (instrDecode.n == 2){
                 int pidScreen = fork();
@@ -312,16 +314,20 @@ void eval(){
                     fprintf(stderr, "ERROR: Failed to create the screen process");
                     error(4, stderr);
                 }
+                cpu.cycleCnt += 10;
             }
             else if (instrDecode.n == 3){
                 cpu.regs[1] = getchar();
+                cpu.cycleCnt += 2;
             }
             else if (instrDecode.n == 4){
                 printf("%c", cpu.regs[1]);
+                cpu.cycleCnt += 2;
             }
             else if (instrDecode.n == 5){
                 srand(time(NULL));
                 cpu.regs[1] = rand() % cpu.regs[2];
+                cpu.cycleCnt += 2;
             }
     }
 
