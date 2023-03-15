@@ -15,7 +15,6 @@
 
 #include "cache.h"
 
-
 #define STOP   0
 #define ADD    1
 #define SUB    2
@@ -41,14 +40,15 @@
 
 Cache cache;
 
-int regs[NB_REGS];
+typedef struct {
+    int running;
+    int regs[NB_REGS];
+    int pc;
+    long instrCnt;
+    long cycleCnt;
+} Cpu_t;
 
-int* instrs;
-int instrNum = 0;
-long instrCnt = 0;
-
-long cycleCnt = 0;
-int running = 1;
+Cpu_t cpu = {1, {}};
 
 typedef struct {
     int opcode;
@@ -60,6 +60,10 @@ typedef struct {
     int a;
     int n;
 } Instr_t;
+
+Instr_t instrDecode = {};
+
+int* instrs;
 
 
 void error(int errorCode, FILE* msg){
@@ -97,81 +101,81 @@ void parseFile(FILE* ptr){
 }
 
 int fetch(){
-    instrCnt++;
-    return instrs[instrNum++];
+    cpu.instrCnt++;
+    return instrs[cpu.pc++];
 }
 
-Instr_t decode(int instr){
-    Instr_t instrStruct;
-    instrStruct.opcode = (instr >> 27) & 0x0000001f;
+void decode(int instr){
+    instrDecode.opcode = (instr >> 27) & 0x0000001f;
 
-    switch(instrStruct.opcode){
+    switch(instrDecode.opcode){
         case STOP:
             break;
         case JMP:
-            instrStruct.imm     = (instr >> 26) & 0x00000001;
-            instrStruct.o       = (instr >> 5)  & 0x0000ffff;
-            instrStruct.r       = (instr)       & 0x0000001f;
+            instrDecode.imm     = (instr >> 26) & 0x00000001;
+            instrDecode.o       = (instr >> 5)  & 0x0000ffff;
+            instrDecode.r       = (instr)       & 0x0000001f;
             break;
         case BRAZ:
-            instrStruct.r       = (instr >> 22) & 0x0000001f;
-            instrStruct.a       = (instr)       & 0x001fffff;
+            instrDecode.r       = (instr >> 22) & 0x0000001f;
+            instrDecode.a       = (instr)       & 0x001fffff;
             break;
         case BRANZ: 
-            instrStruct.r       = (instr >> 22) & 0x0000001f;
-            instrStruct.a       = (instr)       & 0x001fffff;
+            instrDecode.r       = (instr >> 22) & 0x0000001f;
+            instrDecode.a       = (instr)       & 0x001fffff;
             break;
         case SCALL:
-            instrStruct.n       = (instr)       & 0x001fffff;
+            instrDecode.n       = (instr)       & 0x001fffff;
             break;
         default:
-            instrStruct.rAlpha  = (instr >> 22) & 0x0000001f;
-            instrStruct.imm     = (instr >> 21) & 0x00000001;
-            instrStruct.o       = (int16_t)((instr >> 5)  & 0x0000ffff);
-            instrStruct.rBeta   = (instr)       & 0x0000001f;
+            instrDecode.rAlpha  = (instr >> 22) & 0x0000001f;
+            instrDecode.imm     = (instr >> 21) & 0x00000001;
+            instrDecode.o       = (int16_t)((instr >> 5)  & 0x0000ffff);
+            instrDecode.rBeta   = (instr)       & 0x0000001f;
             break;
     }
-    return instrStruct;
 }
 
-void showInstr(Instr_t instr){
+void showInstr(){
     char* instrStrMask;
 
-    if (instr.imm){
-        if (instr.opcode == JMP)
+    if (instrDecode.imm){
+        if (instrDecode.opcode == JMP)
             instrStrMask = "%s r%d r%d";
         else
             instrStrMask = "%s r%d %d r%d";
     }
     else{
-        if (instr.opcode == BRAZ || instr.opcode == BRANZ || instr.opcode == JMP)
+        if (instrDecode.opcode == BRAZ || instrDecode.opcode == BRANZ || instrDecode.opcode == JMP)
             instrStrMask = "%s r%d %d";
-        else if (instr.opcode == SCALL)
+        else if (instrDecode.opcode == SCALL)
             instrStrMask = "%s %d";
+        else if (instrDecode.opcode == STOP)
+            instrStrMask = "%s";
         else
             instrStrMask = "%s r%d r%d r%d";
     }
 
-    switch (instr.opcode){
-        case STOP:  fprintf(stdout, "%s", "stop");                                              break;
-        case ADD:   fprintf(stdout, instrStrMask, "add", instr.rAlpha, instr.o, instr.rBeta);   break;
-        case SUB:   fprintf(stdout, instrStrMask, "sub", instr.rAlpha, instr.o, instr.rBeta);   break;
-        case MUL:   fprintf(stdout, instrStrMask, "mul", instr.rAlpha, instr.o, instr.rBeta);   break;
-        case DIV:   fprintf(stdout, instrStrMask, "div", instr.rAlpha, instr.o, instr.rBeta);   break;
-        case AND:   fprintf(stdout, instrStrMask, "and", instr.rAlpha, instr.o, instr.rBeta);   break;
-        case OR:    fprintf(stdout, instrStrMask, "or", instr.rAlpha, instr.o, instr.rBeta);    break;
-        case XOR:   fprintf(stdout, instrStrMask, "xor", instr.rAlpha, instr.o, instr.rBeta);   break;
-        case SHL:   fprintf(stdout, instrStrMask, "shl", instr.rAlpha, instr.o, instr.rBeta);   break;
-        case SHR:   fprintf(stdout, instrStrMask, "shr", instr.rAlpha, instr.o, instr.rBeta);   break;
-        case SLT:   fprintf(stdout, instrStrMask, "slt", instr.rAlpha, instr.o, instr.rBeta);   break;
-        case SLE:   fprintf(stdout, instrStrMask, "sle", instr.rAlpha, instr.o, instr.rBeta);   break;
-        case SEQ:   fprintf(stdout, instrStrMask, "seq", instr.rAlpha, instr.o, instr.rBeta);   break;
-        case LOAD:  fprintf(stdout, instrStrMask, "load", instr.rAlpha, instr.o, instr.rBeta);  break;
-        case STORE: fprintf(stdout, instrStrMask, "store", instr.rAlpha, instr.o, instr.rBeta); break;
-        case JMP:   fprintf(stdout, instrStrMask, "jmp", instr.o, instr.r);                     break;
-        case BRAZ:  fprintf(stdout, instrStrMask, "braz", instr.r, instr.a);                    break;
-        case BRANZ: fprintf(stdout, instrStrMask, "branz", instr.r, instr.a);                   break;
-        case SCALL: fprintf(stdout, instrStrMask, "scall", instr.n);                            break;
+    switch (instrDecode.opcode){
+        case STOP:  fprintf(stdout, instrStrMask, "stop");                                                        break;
+        case ADD:   fprintf(stdout, instrStrMask, "add",   instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case SUB:   fprintf(stdout, instrStrMask, "sub",   instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case MUL:   fprintf(stdout, instrStrMask, "mul",   instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case DIV:   fprintf(stdout, instrStrMask, "div",   instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case AND:   fprintf(stdout, instrStrMask, "and",   instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case OR:    fprintf(stdout, instrStrMask, "or",    instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case XOR:   fprintf(stdout, instrStrMask, "xor",   instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case SHL:   fprintf(stdout, instrStrMask, "shl",   instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case SHR:   fprintf(stdout, instrStrMask, "shr",   instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case SLT:   fprintf(stdout, instrStrMask, "slt",   instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case SLE:   fprintf(stdout, instrStrMask, "sle",   instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case SEQ:   fprintf(stdout, instrStrMask, "seq",   instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case LOAD:  fprintf(stdout, instrStrMask, "load",  instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case STORE: fprintf(stdout, instrStrMask, "store", instrDecode.rAlpha, instrDecode.o, instrDecode.rBeta); break;
+        case JMP:   fprintf(stdout, instrStrMask, "jmp",   instrDecode.o,      instrDecode.r);                    break;
+        case BRAZ:  fprintf(stdout, instrStrMask, "braz",  instrDecode.r,      instrDecode.a);                    break;
+        case BRANZ: fprintf(stdout, instrStrMask, "branz", instrDecode.r,      instrDecode.a);                    break;
+        case SCALL: fprintf(stdout, instrStrMask, "scall", instrDecode.n);                                        break;
     }
 
     printf("%s\n", stdout);
@@ -184,114 +188,114 @@ void overflow(long val){
     }
 }
 
-void eval(Instr_t instr){
+void eval(){
     int o;
     
-    if (instr.imm) 
-        o = instr.o;
+    if (instrDecode.imm) 
+        o = instrDecode.o;
     else
-         o = regs[instr.o];
+         o = cpu.regs[instrDecode.o];
 
-    switch (instr.opcode){
+    switch (instrDecode.opcode){
         case STOP:
-            running = 0;
+            cpu.running = 0;
             break;
         case ADD:
-            overflow((long long)regs[instr.rAlpha] + o);
-            regs[instr.rBeta] = regs[instr.rAlpha] + o;
-            cycleCnt++;
+            overflow((long long)cpu.regs[instrDecode.rAlpha] + o);
+            cpu.regs[instrDecode.rBeta] = cpu.regs[instrDecode.rAlpha] + o;
+            cpu.cycleCnt++;
             break;
         case SUB:
-            overflow((long long)regs[instr.rAlpha] - o);
-            regs[instr.rBeta] = regs[instr.rAlpha] - o;
-            cycleCnt++;
+            overflow((long long)cpu.regs[instrDecode.rAlpha] - o);
+            cpu.regs[instrDecode.rBeta] = cpu.regs[instrDecode.rAlpha] - o;
+            cpu.cycleCnt++;
             break;
         case MUL:
-            overflow((long long)regs[instr.rAlpha] * o);
-            regs[instr.rBeta] = regs[instr.rAlpha] * o;
-            cycleCnt += 2;
+            overflow((long long)cpu.regs[instrDecode.rAlpha] * o);
+            cpu.regs[instrDecode.rBeta] = cpu.regs[instrDecode.rAlpha] * o;
+            cpu.cycleCnt += 2;
             break;
         case DIV:
-            regs[instr.rBeta] = regs[instr.rAlpha] / o;
-            cycleCnt += 2;
+            cpu.regs[instrDecode.rBeta] = cpu.regs[instrDecode.rAlpha] / o;
+            cpu.cycleCnt += 2;
             break;
         case AND:
-            regs[instr.rBeta] = regs[instr.rAlpha] & o;
-            cycleCnt++;
+            cpu.regs[instrDecode.rBeta] = cpu.regs[instrDecode.rAlpha] & o;
+            cpu.cycleCnt++;
             break;
         case OR:
-            regs[instr.rBeta] = (regs[instr.rAlpha] | o) + (regs[instr.rAlpha] & o);
-            cycleCnt++;
+            cpu.regs[instrDecode.rBeta] = (cpu.regs[instrDecode.rAlpha] | o) + (cpu.regs[instrDecode.rAlpha] & o);
+            cpu.cycleCnt++;
             break;
         case XOR:
-            regs[instr.rBeta] = (regs[instr.rAlpha] ^ o);
-            cycleCnt++;
+            cpu.regs[instrDecode.rBeta] = (cpu.regs[instrDecode.rAlpha] ^ o);
+            cpu.cycleCnt++;
             break;
         case SHL:
-            regs[instr.rBeta] = regs[instr.rAlpha] << o;
-            cycleCnt++;
+            cpu.regs[instrDecode.rBeta] = cpu.regs[instrDecode.rAlpha] << o;
+            cpu.cycleCnt++;
             break;
         case SHR:
-            regs[instr.rBeta] = regs[instr.rAlpha] >> o;
-            cycleCnt++;
+            cpu.regs[instrDecode.rBeta] = cpu.regs[instrDecode.rAlpha] >> o;
+            cpu.cycleCnt++;
             break;
         case SLT:
-            if (regs[instr.rAlpha] < o) 
-                regs[instr.rBeta] = 1;
+            if (cpu.regs[instrDecode.rAlpha] < o) 
+                cpu.regs[instrDecode.rBeta] = 1;
             else 
-                regs[instr.rBeta] = 0;
-            cycleCnt++;
+                cpu.regs[instrDecode.rBeta] = 0;
+            cpu.cycleCnt++;
             break;
         case SLE:
-            if (regs[instr.rAlpha] <= o) 
-                regs[instr.rBeta] = 1;
+            if (cpu.regs[instrDecode.rAlpha] <= o) 
+                cpu.regs[instrDecode.rBeta] = 1;
             else 
-                regs[instr.rBeta] = 0;
-            cycleCnt++;
+                cpu.regs[instrDecode.rBeta] = 0;
+            cpu.cycleCnt++;
             break;
         case SEQ:
-            if (regs[instr.rAlpha] == o) 
-                regs[instr.rBeta] = 1;
+            if (cpu.regs[instrDecode.rAlpha] == o) 
+                cpu.regs[instrDecode.rBeta] = 1;
             else 
-                regs[instr.rBeta] = 0;
-            cycleCnt++;
+                cpu.regs[instrDecode.rBeta] = 0;
+            cpu.cycleCnt++;
             break;
         case LOAD:
-            regs[instr.rBeta] = cache.read(regs[instr.rAlpha] + instr.o);
+            cpu.regs[instrDecode.rBeta] = cache.read(cpu.regs[instrDecode.rAlpha] + instrDecode.o);
             if (cache.getCacheMiss())
-                cycleCnt += 100;
+                cpu.cycleCnt += 100;
             else
-                cycleCnt += 2;
+                cpu.cycleCnt += 2;
             break;
         case STORE:
-            cache.write(regs[instr.rAlpha] + instr.o, regs[instr.rBeta]);
-            cycleCnt += 100;  
+            cache.write(cpu.regs[instrDecode.rAlpha] + instrDecode.o, cpu.regs[instrDecode.rBeta]);
+            cpu.cycleCnt += 100;  
             break;
         case JMP:
-            regs[instr.r] = instrNum;
-            instrNum = o;
-            cycleCnt += 2;
+            cpu.regs[instrDecode.r] = cpu.pc;
+            cpu.pc = o;
+            cpu.cycleCnt += 2;
             break;
         case BRAZ:
-            if (regs[instr.r] == 0) 
-                instrNum = instr.a;
-            cycleCnt += 2;
+            if (cpu.regs[instrDecode.r] == 0) 
+                cpu.pc = instrDecode.a;
+            cpu.cycleCnt += 2;
             break;
         case BRANZ:
-            if (regs[instr.r] != 0) 
-                instrNum = instr.a;
-            cycleCnt += 2;
+            if (cpu.regs[instrDecode.r] != 0) 
+                cpu.pc = instrDecode.a;
+            cpu.cycleCnt += 2;
             break;
         case SCALL:
-            if (instr.n == 0){
+            if (instrDecode.n == 0){
                 int val = 0;
                 scanf("%d", &val);
-                regs[1] = val;
+                cpu.regs[1] = val;
             }
-            else if (instr.n == 1){
-                printf("%d", regs[1]);
+            else if (instrDecode.n == 1){
+                printf("%d", cpu.regs[1]);
             }
-            else if (instr.n == 2){
+            else if (instrDecode.n == 2){
                 int pidScreen = fork();
                 if (pidScreen == 0){
                     execlp("python3", "python3", strcat(dirname(realpath(__FILE__, NULL)), "/screen/screen.py"), NULL);
@@ -301,36 +305,36 @@ void eval(Instr_t instr){
                     error(4, stderr);
                 }
             }
-            else if (instr.n == 3){
-                regs[1] = getchar();
+            else if (instrDecode.n == 3){
+                cpu.regs[1] = getchar();
             }
-            else if (instr.n == 4){
-                printf("%c", regs[1]);
+            else if (instrDecode.n == 4){
+                printf("%c", cpu.regs[1]);
             }
-            else if (instr.n == 5){
+            else if (instrDecode.n == 5){
                 srand(time(NULL));
-                regs[1] = rand() % regs[2];
+                cpu.regs[1] = rand() % cpu.regs[2];
             }
     }
 
-    regs[0] = 0;
+    cpu.regs[0] = 0;
 }
 
 void showCycle(){
-    printf("Cycle number = %ld\n\n", cycleCnt);
+    printf("Cycle number = %ld\n\n", cpu.cycleCnt);
 }
 
 void showRegs(){
     printf("regs = ");
     for (int i = 0; i < NB_REGS; i++){
-        printf("%08x ", regs[i]);
+        printf("%08x ", cpu.regs[i]);
     }
     printf("\n");
 }
 
 void showMips(double execTime){
-    long mips = (instrCnt / (execTime))/1000000;
-    printf("\n\nElapsed time %fs for %ld in %ld cycle\n", execTime, instrCnt, cycleCnt);
+    long mips = (cpu.instrCnt / (execTime))/1000000;
+    printf("\n\nElapsed time %fs for %ld in %ld cycle\n", execTime, cpu.instrCnt, cpu.cycleCnt);
     printf("Estimated MIPS: %ld million par seconde", mips);
 }
 
@@ -355,15 +359,15 @@ int main(int argc, const char* argv[]){
     parseFile(ptrFile);
 
     start = clock();
-    while(running){
+    while(cpu.running){
         int instr = fetch();
-        Instr_t instr_decode = decode(instr);
+        decode(instr);
 
         #ifdef VERBOSE
-            showInstr(instr_decode);
+            showInstr();
         #endif
     
-        eval(instr_decode);
+        eval();
 
         #ifdef VERBOSE
             showRegs();
