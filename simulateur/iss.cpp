@@ -114,6 +114,7 @@ int fetch(){
 }
 
 void decode(int instr){
+    instrDecode = {};
     instrDecode.opcode = (instr >> 27) & 0x0000001f;
 
     switch(instrDecode.opcode){
