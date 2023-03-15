@@ -37,6 +37,9 @@
 
 #define NB_REGS 32
 
+#define PROGRAM_MEMORY 2048
+#define INSTR_NB_OCTET 4
+#define INSTR_MAX (PROGRAM_MEMORY/INSTR_NB_OCTET)-1
 
 Cache cache;
 
@@ -63,7 +66,7 @@ typedef struct {
 
 Instr_t instrDecode = {};
 
-int* instrs;
+int instrs[INSTR_MAX];
 
 
 void error(int errorCode, FILE* msg){
@@ -93,9 +96,14 @@ void parseFile(FILE* ptr){
 
     int i = 0;
     while (fscanf(ptr, "%s %s", addr, instr) != EOF) {
-        instrs = (int*)realloc(instrs, sizeof(instrs));
-        instrs[i] = (int)strtol(instr, NULL, 0);
-        i++;
+        if (i > INSTR_MAX){
+            fprintf(stderr, "ERROR: Memory program filled");
+            error(3, stderr);
+        }
+        else {
+            instrs[i] = (int)strtol(instr, NULL, 0);
+            i++;
+        }
     }
     fclose(ptr);
 }
@@ -184,7 +192,7 @@ void showInstr(){
 void overflow(long val){
      if ((val > (signed)0x7fffffff) || (val < (signed)0x80000000)){
         fprintf(stderr, "ERROR: overflow");
-        error(3, stderr);
+        error(4, stderr);
     }
 }
 

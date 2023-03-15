@@ -92,4 +92,5 @@ Code de sortie | Information
 0              | Programme executer avec succès
 1              | Fichier binaire non précisé
 2              | Erreur lors de l'ouverture du fichier binaire
-3              | Dépassement du registre _(overflow)_
+3              | Mémoire d'instruction dépassée
+4              | Dépassement du registre _(overflow)_
