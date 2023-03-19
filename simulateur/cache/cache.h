@@ -12,7 +12,7 @@
 
 #include "memory.h"
 
-#define CACHE_SIZE 104 
+#define CACHE_SIZE 512 
 #define BLOCK_SIZE 4
 #define NB_BLOC_CACHE CACHE_SIZE/BLOCK_SIZE
 
