@@ -372,7 +372,7 @@ int main(int argc, const char* argv[]){
 
     start = clock();
     while(cpu.running){
-        unsigned int instr = fetch();
+        instr = fetch();
         decode(instr);
 
         #ifdef VERBOSE

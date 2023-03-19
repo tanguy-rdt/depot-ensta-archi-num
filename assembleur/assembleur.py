@@ -123,7 +123,9 @@ def conf_logging(log=False, debug=False):
         logging_level = logging.INFO
         
     if (log):
-        logging.basicConfig(filename='assembleur.log',
+        log_file_path = os.path.join(os.path.dirname(__file__), "assembleur.log")
+        logging.basicConfig(filename=log_file_path,
+                            filemode="w",
                             format='%(asctime)s -- %(levelname)s -- %(message)s',
                             datefmt='%Y-%m-%d, %H:%M:%S', 
                             level=logging_level)
