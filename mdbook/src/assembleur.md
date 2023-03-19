@@ -25,7 +25,7 @@ Il est nécessaire de spécifier le chemin du fichier asm avec l'option `-i` et 
 ## Options 
 
 ```
-$ python3 assembleur.py -h
+$ assembleur -h
 Usage: assembleur.py [options]
 
 Options:
@@ -98,7 +98,7 @@ __Exemple:__
 
 Code de sortie | Information 
 ---------------|------------
-0              | Programme exécuter avec succès
+0              | Programme exécuté avec succès
 1              | Option -i et/ou -o non précisé
 2              | Erreur lors de l'ouverture du fichier asm
 3              | Erreur lors de la création du fichier binaire
